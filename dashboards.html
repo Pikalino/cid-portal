@@ -35,6 +35,7 @@ h1{font-size:28px;font-weight:600}
 .go svg{transition:transform .25s}
 .card:hover .go svg{transform:translateX(4px)}
 .empty{grid-column:1/-1;text-align:center;color:var(--dim);padding:40px;font-size:14px}
+.card.soon{cursor:default;opacity:.6}.card.soon:hover{transform:none;box-shadow:none;border-color:var(--line)}.card.soon:hover::after{width:0}.card.soon .go{color:var(--dim)}
 @keyframes rise{from{opacity:0;transform:translateY(12px)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -68,11 +69,11 @@ function chips(){document.getElementById("chips").innerHTML=cats.map(c=>`<button
   document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{cat=b.dataset.c;chips();draw()})}
 function draw(){const q=document.getElementById("q").value.trim().toLowerCase();
   const list=REPORTS.filter(r=>(cat==="All"||r.category===cat)&&(r.title+" "+r.desc).toLowerCase().includes(q));
-  document.getElementById("grid").innerHTML=list.length?list.map((r,i)=>`
-    <a class="card" href="${esc(r.link)}" target="_top" style="animation-delay:${i*60}ms">
+  document.getElementById("grid").innerHTML=list.length?list.map((r,i)=>{const ok=r.link&&r.link!=="#";return `
+    <a class="card${ok?"":" soon"}" ${ok?`href="${esc(r.link)}" target="_top"`:""} style="animation-delay:${i*60}ms">
       <div class="row"><div class="ico">${ICON}</div><span class="tag">${esc(r.category)}</span></div>
-      <h3>${esc(r.title)}</h3><p>${esc(r.desc)}</p><span class="go">Open report ${ARROW}</span>
-    </a>`).join(""):`<div class="empty">No reports match your search.</div>`}
+      <h3>${esc(r.title)}</h3><p>${esc(r.desc)}</p><span class="go">${ok?"Open report "+ARROW:"Coming soon"}</span>
+    </a>`}).join(""):`<div class="empty">No reports match your search.</div>`}
 document.getElementById("q").addEventListener("input",draw);
 chips();draw();
 </script>
