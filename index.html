@@ -50,6 +50,7 @@ h1 span{color:var(--red-soft)}
 .go{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-size:13px;font-weight:600;color:var(--red)}
 .go svg{transition:transform .25s}
 .card:hover .go svg{transform:translateX(4px)}
+.card.soon{cursor:default;opacity:.55}.card.soon:hover{transform:none;box-shadow:none;border-color:var(--line)}.card.soon:hover::after{width:0}.card.soon:hover .ico{transform:none}.card.soon .go{color:var(--dim)}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}}
 @media (max-width:760px){.hero{grid-template-columns:1fr;padding:28px 22px}.art{display:none}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.draw{stroke-dashoffset:0}}
@@ -105,11 +106,11 @@ h1 span{color:var(--red-soft)}
       <h3>Events</h3><p>QR check-in, seating plans and event-day tools.</p>
       <span class="go">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
     </a>
-    <a class="card" data-link="resources" style="--d:.45s">
+        <div class="card soon" style="--d:.45s">
       <div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h5v18H6a2 2 0 0 1-2-2zM13 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5z"/></svg></div>
-      <h3>Resources</h3><p>Handbooks, presentations, HR resources and team contacts.</p>
-      <span class="go">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-    </a>
+      <h3>Resources</h3><p>Files, templates and materials for each department.</p>
+      <span class="go">Coming soon</span>
+    </div>
   </section>
 </div>
 
