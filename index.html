@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CID Portal</title>
+<style>
+:root{--red:#A4262C;--red-soft:#F2545B;--ink:#1b1f24;--dim:#5d6670;--line:#e4e7eb;--navy:#0f2a4a}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#fff;color:var(--ink);font-family:"Segoe UI Variable","Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
+.wrap{max-width:1200px;margin:0 auto;padding:8px 4px 24px}
+.hero{position:relative;overflow:hidden;display:grid;grid-template-columns:1.15fr .85fr;gap:24px;align-items:center;
+  padding:40px 40px 36px;border-radius:20px;background:var(--navy);color:#fff;animation:rise .7s ease both}
+.hero::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px),
+  linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:96px 96px,96px 96px,24px 24px,24px 24px;animation:pan 40s linear infinite}
+@keyframes pan{to{background-position:96px 96px,96px 96px,24px 24px,24px 24px}}
+.hero>*{position:relative}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;letter-spacing:.04em;color:rgba(255,255,255,.75)}
+.eyebrow i{width:8px;height:8px;border-radius:50%;background:var(--red-soft);box-shadow:0 0 0 0 rgba(242,84,91,.6);animation:ping 2s infinite}
+@keyframes ping{70%{box-shadow:0 0 0 10px rgba(242,84,91,0)}100%{box-shadow:0 0 0 0 rgba(242,84,91,0)}}
+h1{font-size:clamp(28px,3.6vw,44px);line-height:1.1;font-weight:600;margin:14px 0 12px}
+h1 span{color:var(--red-soft)}
+.lead{font-size:16px;line-height:1.6;color:rgba(255,255,255,.75);max-width:480px}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:10px;font-size:14px;font-weight:600;text-decoration:none;transition:transform .2s,background .2s}
+.btn.primary{background:var(--red);color:#fff}
+.btn.primary:hover{background:#8c1f25;transform:translateY(-2px)}
+.btn.ghost{color:#fff;border:1px solid rgba(255,255,255,.3)}
+.btn.ghost:hover{background:rgba(255,255,255,.08);transform:translateY(-2px)}
+.art{width:100%;height:auto}
+.bar{transform-box:fill-box;transform-origin:bottom;animation:grow .9s cubic-bezier(.2,.9,.3,1) both}
+@keyframes grow{from{transform:scaleY(0)}}
+.draw{stroke-dasharray:320;stroke-dashoffset:320;animation:draw 1.6s .6s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.dot{transform-box:fill-box;transform-origin:center;animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.6);opacity:.5}}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:18px}
+.card{position:relative;overflow:hidden;display:block;padding:22px;border-radius:16px;border:1px solid var(--line);background:#fff;color:inherit;text-decoration:none;
+  transition:transform .25s ease,box-shadow .25s ease,border-color .25s;animation:rise .6s ease both;animation-delay:var(--d)}
+.card:hover{transform:translateY(-5px);box-shadow:0 14px 30px rgba(15,42,74,.12);border-color:rgba(164,38,44,.35)}
+.card::after{content:"";position:absolute;left:0;bottom:0;height:3px;width:0;background:var(--red);transition:width .35s ease}
+.card:hover::after{width:100%}
+.ico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:#fbeced;color:var(--red);transition:transform .3s}
+.card:hover .ico{transform:rotate(-6deg) scale(1.08)}
+.card h3{font-size:17px;font-weight:600;margin:16px 0 6px}
+.card p{font-size:14px;line-height:1.5;color:var(--dim)}
+.go{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-size:13px;font-weight:600;color:var(--red)}
+.go svg{transition:transform .25s}
+.card:hover .go svg{transform:translateX(4px)}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}}
+@media (max-width:760px){.hero{grid-template-columns:1fr;padding:28px 22px}.art{display:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.draw{stroke-dashoffset:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <div>
+      <div class="eyebrow"><i></i>CID · Barloworld Mongolia</div>
+      <h1>Everything CID,<br><span>in one place.</span></h1>
+      <p class="lead">Live dashboards, CRM updates, event tools and team resources — one clean starting point for the whole team.</p>
+      <div class="btns">
+        <a class="btn primary" data-link="dashboards">Open dashboards
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn ghost" data-link="crm">What’s new in CRM</a>
+      </div>
+    </div>
+    <svg class="art" viewBox="0 0 360 250" fill="none" aria-hidden="true">
+      <rect x="10" y="10" width="340" height="200" rx="8" stroke="rgba(255,255,255,.35)" stroke-dasharray="5 4"/>
+      <g fill="rgba(255,255,255,.18)" stroke="rgba(255,255,255,.55)">
+        <rect class="bar" x="40" y="120" width="26" height="70" rx="3" style="animation-delay:.2s"/>
+        <rect class="bar" x="80" y="90" width="26" height="100" rx="3" style="animation-delay:.32s"/>
+        <rect class="bar" x="120" y="140" width="26" height="50" rx="3" style="animation-delay:.44s"/>
+        <rect class="bar" x="160" y="70" width="26" height="120" rx="3" style="animation-delay:.56s"/>
+      </g>
+      <path class="draw" d="M210 170 L245 135 L280 148 L320 80" stroke="#F2545B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <g fill="#F2545B">
+        <circle class="dot" cx="245" cy="135" r="4"/>
+        <circle class="dot" cx="280" cy="148" r="4" style="animation-delay:.4s"/>
+        <circle class="dot" cx="320" cy="80" r="5" style="animation-delay:.8s"/>
+      </g>
+      <text x="40" y="38" fill="rgba(255,255,255,.7)" font-size="11" font-family="Segoe UI,sans-serif">Pipeline</text>
+      <text x="210" y="38" fill="rgba(255,255,255,.7)" font-size="11" font-family="Segoe UI,sans-serif">Check-ins</text>
+      <path d="M10 232h340M10 226v12M350 226v12" stroke="rgba(255,255,255,.4)"/>
+      <text x="180" y="247" text-anchor="middle" fill="rgba(255,255,255,.55)" font-size="10" font-family="Segoe UI,sans-serif">CID · 2026</text>
+    </svg>
+  </section>
+
+  <section class="cards">
+    <a class="card" data-link="dashboards" style="--d:.15s">
+      <div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div>
+      <h3>Dashboards</h3><p>Live Power BI reports for leadership and sales.</p>
+      <span class="go">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </a>
+    <a class="card" data-link="crm" style="--d:.25s">
+      <div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.8c1.7.8 2.8 2.6 3 5.2"/></svg></div>
+      <h3>CRM</h3><p>Patch notes, how-to guides and quick links into Dynamics 365.</p>
+      <span class="go">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </a>
+    <a class="card" data-link="events" style="--d:.35s">
+      <div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v.01M14 21h7v-4"/></svg></div>
+      <h3>Events</h3><p>QR check-in, seating plans and event-day tools.</p>
+      <span class="go">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </a>
+    <a class="card" data-link="resources" style="--d:.45s">
+      <div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h5v18H6a2 2 0 0 1-2-2zM13 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5z"/></svg></div>
+      <h3>Resources</h3><p>Handbooks, presentations, HR resources and team contacts.</p>
+      <span class="go">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </a>
+  </section>
+</div>
+
+<script>
+/* Put your real links here later. "#" means not set yet. */
+const LINKS = {
+  dashboards: "#",
+  crm: "#",
+  events: "#",
+  resources: "#"
+};
+document.querySelectorAll("[data-link]").forEach(a => {
+  a.href = LINKS[a.dataset.link] || "#";
+  a.target = "_top";
+});
+</script>
+</body>
+</html>
