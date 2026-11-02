@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CID Seat Planner</title>
 <style>
-:root{--bg:#0b1e35;--panel:#10263f;--line:#24405f;--ink:#e8eef5;--dim:#8aa0b8;--blue:#4a90d9;--amber:#e0a526;--green:#4aa564;--purple:#8f86e8;--red:#e35d5d}
+:root{--bg:#0b1e35;--panel:#10263f;--line:#24405f;--ink:#e8eef5;--dim:#8aa0b8;--blue:#4a90d9;--amber:#e0a526;--green:#4aa564;--purple:#8f86e8}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,sans-serif;font-size:14px}
 body{display:flex;flex-direction:column}
@@ -17,14 +17,15 @@ input[type=number]{width:70px}
 button{background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:13px;cursor:pointer;font-family:inherit}
 button:hover{border-color:var(--blue)}
 button.pri{background:var(--amber);border-color:var(--amber);color:#1a1408;font-weight:600}
+button.on{background:var(--blue);border-color:var(--blue)}
 #msg{font-size:12px;color:var(--amber);align-self:center;min-width:120px}
 .wrap{flex:1;display:flex;min-height:0}
 #map{flex:1;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
-aside{width:340px;background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+aside{width:350px;background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
 .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:12px;border-bottom:1px solid var(--line)}
 .stat{background:var(--bg);border-radius:10px;padding:8px 10px}
 .stat b{display:block;font-size:18px;font-weight:600}.stat span{font-size:11px;color:var(--dim)}
-#warn{grid-column:1/-1;font-size:12px;color:var(--amber)}
+.note{grid-column:1/-1;font-size:12px;color:var(--amber)}
 #panel{flex:1;overflow-y:auto;padding:12px}
 h2{font-size:15px;margin:0 0 10px;font-weight:600}
 .row{display:flex;align-items:center;gap:8px;padding:7px 6px;border-bottom:1px solid var(--line);font-size:13px}
@@ -34,6 +35,8 @@ h2{font-size:15px;margin:0 0 10px;font-weight:600}
 .x{border:none;padding:2px 6px;color:var(--dim)}
 .g{cursor:pointer;border-radius:8px}.g:hover{background:var(--bg)}
 .tag{font-size:11px;padding:2px 8px;border-radius:999px;background:#16301e;color:#8fe0a6}
+.chip{display:inline-flex;align-items:center;gap:4px;background:#2a2560;color:#cfcaff;border-radius:999px;padding:3px 4px 3px 10px;font-size:12px;margin:0 6px 6px 0}
+.chip button{border:none;padding:0 6px;color:#cfcaff}
 .it{cursor:move}
 .it.sel .sh{stroke:var(--amber);stroke-width:2.5}
 .ch{animation:pop .35s cubic-bezier(.2,1.4,.4,1) both;transform-box:fill-box;transform-origin:center}
@@ -44,12 +47,13 @@ h2{font-size:15px;margin:0 0 10px;font-weight:600}
 <body>
 <header>
   <h1>Seat planner</h1>
-  <label class="f">Width (m)<input id="iW" type="number" min="10" max="200" step="1"></label>
-  <label class="f">Length (m)<input id="iL" type="number" min="10" max="200" step="1"></label>
+  <label class="f">Width (m)<input id="iW" type="number" min="10" max="300" step="1"></label>
+  <label class="f">Length (m)<input id="iL" type="number" min="10" max="300" step="1"></label>
   <label class="f">Guests<input id="iN" type="number" min="1" max="3000" step="1" value="100"></label>
-  <label class="f">Table<select id="iS"><option value="round">Round</option><option value="square">Square</option></select></label>
-  <label class="f">Chairs<select id="iC"><option>6</option><option selected>8</option><option>10</option><option>12</option></select></label>
+  <label class="f">Table<select id="iS"><option value="round">Round</option><option value="square">Square</option><option value="oval">Oval</option><option value="long">Long</option></select></label>
+  <label class="f">Chairs<input id="iC" type="number" min="1" max="40" step="1" value="8"></label>
   <button class="pri" id="bGen">Generate</button>
+  <button id="bHall">Hall shape</button>
   <button id="bT">+ Table</button>
   <button id="bZ">+ Zone</button>
   <button id="bAuto">Auto-seat by company</button>
@@ -69,7 +73,7 @@ h2{font-size:15px;margin:0 0 10px;font-weight:600}
       <pattern id="m1" width="1" height="1" patternUnits="userSpaceOnUse"><path d="M1 0H0V1" fill="none" stroke="#4a90d9" stroke-opacity=".14" stroke-width=".03"/></pattern>
       <pattern id="m5" width="5" height="5" patternUnits="userSpaceOnUse"><rect width="5" height="5" fill="url(#m1)"/><path d="M5 0H0V5" fill="none" stroke="#4a90d9" stroke-opacity=".32" stroke-width=".06"/></pattern>
     </defs>
-    <g id="hall"></g><g id="items"></g>
+    <g id="hall"></g><g id="items"></g><g id="hdl"></g>
   </svg>
   <aside>
     <div class="stats" id="stats"></div>
@@ -85,106 +89,201 @@ const EMP=[{id:"u1",name:"J. Jargal"},{id:"u2",name:"B. Bolor"},{id:"u3",name:"T
 const ROLES=["Sales rep","Director","Other"];
 /* ========================================================== */
 
-const KEY="cid-desks-v1", NS="http://www.w3.org/2000/svg";
+const KEY="cid-desks-v2", NS="http://www.w3.org/2000/svg";
 const $=id=>document.getElementById(id);
-const svg=$("map"), HG=$("hall"), IG=$("items");
+const svg=$("map"), HG=$("hall"), IG=$("items"), HD=$("hdl");
 const attById=Object.fromEntries(ATT.map(a=>[a.id,a]));
 const empById=Object.fromEntries(EMP.map(u=>[u.id,u]));
-let S=load()||{W:40,L:28,items:[],nid:1};
-let sel=null, vb={x:0,y:0,w:40,h:28}, drag=null, pan=null, msgT=null;
+const KINDS={stage:["Stage / main","#4a90d9",.28,"none"],display:["Display / screen","#e0a526",.2,"none"],area:["Area","#4a90d9",.06,"4 3"],entrance:["Entrance / exit","#4aa564",.3,"none"]};
+const rectPts=(W,L)=>[[0,0],[W,0],[W,L],[0,L]];
+const lPts=(W,L)=>[[0,0],[+(W*.6).toFixed(1),0],[+(W*.6).toFixed(1),+(L*.45).toFixed(1)],[W,+(L*.45).toFixed(1)],[W,L],[0,L]];
+let S=load()||{hall:{preset:"rect",type:"poly",W:40,L:28,pts:rectPts(40,28)},items:[],nid:1};
+let sel=null, vtx=-1, vb={x:0,y:0,w:40,h:28}, drag=null, pan=null, msgT=null;
 
-function load(){try{const o=JSON.parse(localStorage.getItem(KEY));return o&&Array.isArray(o.items)?o:null}catch(e){return null}}
+function load(){try{const o=JSON.parse(localStorage.getItem(KEY));return o&&o.hall&&Array.isArray(o.items)?o:null}catch(e){return null}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function flash(t){$("msg").textContent=t;clearTimeout(msgT);msgT=setTimeout(()=>$("msg").textContent="",3500)}
 function el(n,a,p){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
-function tx(p,x,y,s,fs,fill,anchor){const t=el("text",{x,y,"font-size":fs,fill:fill||"#e8eef5","text-anchor":anchor||"middle","pointer-events":"none","font-family":"Segoe UI,sans-serif"},p);t.textContent=s;return t}
+function tx(p,x,y,s,fs,fill,extra){const t=el("text",Object.assign({x,y,"font-size":fs,fill:fill||"#e8eef5","text-anchor":"middle","pointer-events":"none","font-family":"Segoe UI,sans-serif"},extra||{}),p);t.textContent=s;return t}
+const snap=v=>Math.round(v*2)/2;
 function tables(){return S.items.filter(i=>i.k==="t")}
+function zones(){return S.items.filter(i=>i.k==="z")}
 function find(id){return S.items.find(i=>i.id===id)}
 function seated(){const s=new Set();tables().forEach(t=>t.seats.forEach((x,i)=>{if(i>0&&x)s.add(x.a)}));return s}
 function pool(){const s=seated();return ATT.filter(a=>!s.has(a.id))}
 function nextNum(){return tables().reduce((m,t)=>Math.max(m,t.num),0)+1}
-function ring(t){return Math.max(1.3,t.chairs*.17)}
+function hostOf(uid){const t=tables().find(t=>t.seats[0]&&t.seats[0].u===uid);return t?t.num:null}
+function stationOf(uid){const z=zones().find(z=>(z.staff||[]).includes(uid));return z?z.label:null}
 
-function mkTable(x,y,shape,chairs,num){return{k:"t",id:S.nid++,num,shape,chairs,x,y,seats:Array(chairs).fill(null)}}
-function mkZone(label,x,y,w,h,kind){return{k:"z",id:S.nid++,label,x,y,w,h,kind}}
+function mkTable(x,y,shape,chairs,num){return{k:"t",id:S.nid++,num,shape,chairs,rot:0,x,y,seats:Array(chairs).fill(null)}}
+function mkZone(label,x,y,w,h,kind){return{k:"z",id:S.nid++,label,shape:"rect",x:+x.toFixed(1),y:+y.toFixed(1),w:+w.toFixed(1),h:+h.toFixed(1),rot:0,kind,staff:[],pts:null}}
 
+/* ---------- geometry ---------- */
+function dims(t){const n=t.chairs;
+  if(t.shape==="round"){const R=Math.max(1.3,n*.7/(2*Math.PI));return{e:1,rx:R,ry:R,tx:R-.45,ty:R-.45}}
+  if(t.shape==="oval"){const b=Math.max(1,n*.7/8.975),a=b*1.8;return{e:1,rx:a,ry:b,tx:a-.45,ty:b-.45}}
+  if(t.shape==="square"){const R=Math.max(1.3,n*.7/8);return{e:0,rx:R,ry:R,tx:R-.45,ty:R-.45}}
+  const len=Math.max(1.8,Math.ceil(n/2)*.7);return{e:0,long:1,rx:len/2+.45,ry:.9,tx:len/2,ty:.45}}
+function chairPos(t,i){const d=dims(t),n=t.chairs;
+  if(d.e){const a=-Math.PI/2+i*2*Math.PI/n;return[Math.cos(a)*d.rx,Math.sin(a)*d.ry]}
+  if(d.long){const top=Math.ceil(n/2),bot=n-top;
+    if(i<top){const sp=2*d.tx/top;return[-d.tx+sp*(i+.5),-d.ry]}
+    const k=i-top,sp=2*d.tx/Math.max(1,bot);return[d.tx-sp*(k+.5),d.ry]}
+  const w=2*d.rx,h=2*d.ry,s=2*(w+h)/n;let p=s*(i+.5);
+  if(p<w)return[-d.rx+p,-d.ry];p-=w;if(p<h)return[d.rx,-d.ry+p];p-=h;if(p<w)return[d.rx-p,d.ry];p-=w;return[-d.rx,d.ry-p]}
+function hb(){const h=S.hall;if(h.type==="ellipse")return{x0:0,y0:0,x1:h.W,y1:h.L};
+  const xs=h.pts.map(p=>p[0]),ys=h.pts.map(p=>p[1]);return{x0:Math.min(...xs),y0:Math.min(...ys),x1:Math.max(...xs),y1:Math.max(...ys)}}
+function inside(x,y){const h=S.hall;
+  if(h.type==="ellipse"){const a=h.W/2,b=h.L/2;return((x-a)/a)**2+((y-b)/b)**2<=1}
+  let c=false;const P=h.pts;for(let i=0,j=P.length-1;i<P.length;j=i++){const[xi,yi]=P[i],[xj,yj]=P[j];if((yi>y)!==(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)c=!c}return c}
+function fitsAt(x,y,rx,ry){if(!inside(x,y))return false;for(let k=0;k<8;k++){const a=k*Math.PI/4;if(!inside(x+Math.cos(a)*(rx+.3),y+Math.sin(a)*(ry+.3)))return false}return true}
+function spanAt(y){const b=hb();let lo=null,hi=null;for(let x=b.x0;x<=b.x1;x+=.25)if(inside(x,y)){if(lo===null)lo=x;hi=x}return lo===null?null:[lo,hi]}
+function zbox(z){if(z.shape==="poly"){const xs=z.pts.map(p=>p[0]),ys=z.pts.map(p=>p[1]);return{x:z.x+Math.min(...xs),y:z.y+Math.min(...ys),w:Math.max(...xs)-Math.min(...xs),h:Math.max(...ys)-Math.min(...ys)}}return{x:z.x,y:z.y,w:z.w,h:z.h}}
+function hitsZone(x,y,rx,ry){return zones().some(z=>{const b=zbox(z);return x+rx+.4>b.x&&x-rx-.4<b.x+b.w&&y+ry+.4>b.y&&y-ry-.4<b.y+b.h})}
+
+/* ---------- hall presets ---------- */
+function applyHall(preset,W,L){const h=S.hall;h.preset=preset;h.W=W;h.L=L;
+  if(preset==="oval"){h.type="ellipse";h.pts=null}else{h.type="poly";h.pts=preset==="L"?lPts(W,L):rectPts(W,L)}}
+function toCustom(){const h=S.hall;
+  if(h.type==="ellipse"){h.pts=Array.from({length:16},(_,k)=>{const a=k*Math.PI/8;return[+(h.W/2+Math.cos(a)*h.W/2).toFixed(1),+(h.L/2+Math.sin(a)*h.L/2).toFixed(1)]});h.type="poly"}
+  h.preset="custom"}
+
+/* ---------- generate ---------- */
 function generate(){
-  const W=+$("iW").value,L=+$("iL").value,N=+$("iN").value,shape=$("iS").value,ch=+$("iC").value;
-  if(!(W>=10&&W<=200&&L>=10&&L<=200)){flash("Width and length must be 10–200 m");return}
+  const W=+$("iW").value,L=+$("iL").value,N=+$("iN").value,shape=$("iS").value,ch=Math.round(+$("iC").value);
+  if(!(W>=10&&W<=300&&L>=10&&L<=300)){flash("Width and length must be 10–300 m");return}
   if(!(N>=1&&N<=3000)){flash("Guests must be 1–3000");return}
-  if(S.items.length&&!confirm("Replace the current layout?"))return;
-  S={W,L,items:[],nid:1};
-  const sh=Math.min(5,L*.15), bw=Math.min(6,W*.14);
-  S.items.push(mkZone("Stage · Тайз",W*.3,1,W*.4,sh,"stage"),mkZone("LED",W*.3-2.2,1.5,1.4,sh*.7,"display"),mkZone("LED",W*.7+.8,1.5,1.4,sh*.7,"display"),
-    mkZone("Registration · Бүртгэл",1,L-4.5,Math.min(8,W*.2),3.5,"area"),mkZone("Buffet",W-bw-1,L*.3,bw,L*.35,"area"));
-  const r=Math.max(1.3,ch*.17), pitch=2*r+1.4, need=Math.ceil(N/(ch-1));
+  if(!(ch>=1&&ch<=40)){flash("Chairs must be 1–40");return}
+  if(S.items.length&&!confirm("Replace all tables and zones?"))return;
+  S.items=[];S.nid=1;
+  if(S.hall.preset!=="custom")applyHall(S.hall.preset||"rect",W,L);
+  const b=hb(),H=b.y1-b.y0,Wd=b.x1-b.x0;
+  const sh=Math.min(5,H*.15),sp=spanAt(b.y0+1+sh/2);
+  if(sp){const sw=Math.min(16,(sp[1]-sp[0])*.5),sx=(sp[0]+sp[1])/2-sw/2;
+    S.items.push(mkZone("Stage · Тайз",sx,b.y0+1,sw,sh,"stage"));
+    if(inside(sx-2.2,b.y0+1.5)&&inside(sx-2.2,b.y0+1.5+sh*.7))S.items.push(mkZone("LED",sx-2.2,b.y0+1.5,1.4,sh*.7,"display"));
+    if(inside(sx+sw+2.2,b.y0+1.5)&&inside(sx+sw+2.2,b.y0+1.5+sh*.7))S.items.push(mkZone("LED",sx+sw+.8,b.y0+1.5,1.4,sh*.7,"display"))}
+  const se=spanAt(b.y1-.5);if(se)S.items.push(mkZone("Entrance · Орц",(se[0]+se[1])/2-2,b.y1-.9,4,.6,"entrance"));
+  const sr=spanAt(b.y1-3);if(sr)S.items.push(mkZone("Registration · Бүртгэл",sr[0]+.8,b.y1-4.6,Math.min(7,(sr[1]-sr[0])*.25),3.2,"area"));
+  const bw=Math.min(6,Wd*.12),bh=H*.3,my=(b.y0+b.y1)/2,sb=spanAt(my);
+  if(sb){const bx=sb[1]-bw-.8,by=my-bh/2;if([[bx,by],[bx+bw,by],[bx,by+bh],[bx+bw,by+bh]].every(p=>inside(p[0],p[1])))S.items.push(mkZone("Buffet",bx,by,bw,bh,"area"))}
+  const d=dims({shape,chairs:ch}),px=2*d.rx+1.2,py=2*d.ry+1.2,need=Math.ceil(N/Math.max(1,ch-1));
   let made=0,num=1;
-  for(let y=sh+3+r;y<=L-2-r&&made<need;y+=pitch)for(let x=2+r;x<=W-bw-2-r&&made<need;x+=pitch){S.items.push(mkTable(+x.toFixed(1),+y.toFixed(1),shape,ch,num++));made++}
-  sel=null;fit();refresh();
-  flash(made<need?`Hall fits ${made} tables (${made*(ch-1)} guests). Make it bigger for ${N}.`:`${made} tables placed`);
+  for(let y=b.y0+d.ry+.8;y<=b.y1-d.ry&&made<need;y+=py)for(let x=b.x0+d.rx+.8;x<=b.x1-d.rx&&made<need;x+=px){
+    if(fitsAt(x,y,d.rx,d.ry)&&!hitsZone(x,y,d.rx,d.ry)){S.items.push(mkTable(+x.toFixed(1),+y.toFixed(1),shape,ch,num++));made++}}
+  sel=null;vtx=-1;fit();refresh();
+  flash(made<need?`Hall fits ${made} tables (${made*Math.max(0,ch-1)} guests). Make it bigger for ${N}.`:`${made} tables placed`);
 }
 
-function chairPos(t,i){const n=t.chairs,r=ring(t);
-  if(t.shape==="round"){const a=-Math.PI/2+i*2*Math.PI/n;return[Math.cos(a)*r,Math.sin(a)*r]}
-  const per=Math.ceil(n/4),side=Math.floor(i/per),k=i%per,o=(k-(per-1)/2)*.75;return[[o,-r],[r,o],[-o,r],[-r,-o]][side]}
+/* ---------- drawing ---------- */
 function chairCol(t,i){const s=t.seats[i];
   if(i===0)return s?["#8f86e8","#5d54c4"]:["none","#8f86e8"];
   if(!s)return["none","#4a90d9"];const a=attById[s.a];return a&&a.arrived?["#4aa564","#2f7a45"]:["#e0a526","#a8780f"]}
-
-function drawHall(){HG.innerHTML="";const fs=Math.max(.5,Math.min(S.W,S.L)/45);
-  el("rect",{x:0,y:0,width:S.W,height:S.L,fill:"url(#m5)"},HG);
-  el("rect",{x:0,y:0,width:S.W,height:S.L,fill:"none",stroke:"#4a90d9","stroke-width":2,"stroke-dasharray":"8 5","vector-effect":"non-scaling-stroke"},HG);
-  tx(HG,S.W/2,-.7,S.W+" m",fs,"#8aa0b8");
-  const t=tx(HG,-.7,S.L/2,S.L+" m",fs,"#8aa0b8");t.setAttribute("transform",`rotate(-90 -.7 ${S.L/2})`);
-  el("line",{x1:S.W/2-2,y1:S.L,x2:S.W/2+2,y2:S.L,stroke:"#4aa564","stroke-width":.4},HG);
-  tx(HG,S.W/2,S.L-.7,"Entrance · Орц",fs*.9,"#7fd197");}
-
+function drawHall(){HG.innerHTML="";const h=S.hall,b=hb(),fs=Math.max(.5,Math.min(b.x1-b.x0,b.y1-b.y0)/45),on=sel==="hall";
+  const a={fill:"url(#m5)",stroke:on?"#e0a526":"#4a90d9","stroke-width":on?2.5:2,"stroke-dasharray":"8 5","vector-effect":"non-scaling-stroke"};
+  if(h.type==="ellipse")el("ellipse",Object.assign({cx:h.W/2,cy:h.L/2,rx:h.W/2,ry:h.L/2},a),HG);
+  else el("polygon",Object.assign({points:h.pts.map(p=>p.join(",")).join(" ")},a),HG);
+  tx(HG,(b.x0+b.x1)/2,b.y0-.8,Math.round(b.x1-b.x0)+" m",fs,"#8aa0b8");
+  tx(HG,b.x0-.8,(b.y0+b.y1)/2,Math.round(b.y1-b.y0)+" m",fs,"#8aa0b8",{transform:`rotate(-90 ${b.x0-.8} ${(b.y0+b.y1)/2})`});}
 function drawItems(){IG.innerHTML="";
-  S.items.forEach((it,idx)=>{const g=el("g",{class:"it"+(it.id===sel?" sel":""),transform:`translate(${it.x},${it.y})`,"data-id":it.id},IG);
-    if(it.k==="z"){const c={stage:["#4a90d9",.28,"none"],display:["#e0a526",.2,"none"],area:["#4a90d9",.06,"4 3"]}[it.kind]||["#4a90d9",.06,"4 3"];
-      el("rect",{class:"sh",width:it.w,height:it.h,rx:.3,fill:c[0],"fill-opacity":c[1],stroke:c[0],"stroke-width":1.2,"stroke-dasharray":c[2],"vector-effect":"non-scaling-stroke"},g);
-      const fs=Math.max(.35,Math.min(1,it.h*.35,it.w/Math.max(4,it.label.length)*1.7));tx(g,it.w/2,it.h/2+fs*.35,it.label,fs);}
-    else{it.seats.forEach((s,i)=>{const[cx,cy]=chairPos(it,i),[f,st]=chairCol(it,i);
-        el("circle",{class:"ch",cx,cy,r:.3,fill:f,stroke:st,"stroke-width":1.4,"vector-effect":"non-scaling-stroke",style:`animation-delay:${Math.min(idx*6+i*18,500)}ms`},g)});
-      const tr=ring(it)-.45;
-      const sh=it.shape==="round"?el("circle",{class:"sh",r:tr},g):el("rect",{class:"sh",x:-tr,y:-tr,width:2*tr,height:2*tr,rx:.15},g);
-      [["fill","#4a90d9"],["fill-opacity",.16],["stroke","#4a90d9"],["stroke-width",1.2],["vector-effect","non-scaling-stroke"]].forEach(([k,v])=>sh.setAttribute(k,v));
-      tx(g,0,.28,String(it.num),.8);}
-    g.addEventListener("pointerdown",e=>startDrag(e,it));});}
-
+  [...zones(),...tables()].forEach((it,idx)=>{
+    if(it.k==="z"){const c=KINDS[it.kind]||KINDS.area;
+      let tf=`translate(${it.x},${it.y})`;if(it.shape!=="poly"&&it.rot)tf+=` rotate(${it.rot} ${it.w/2} ${it.h/2})`;
+      const g=el("g",{class:"it"+(it.id===sel?" sel":""),transform:tf,"data-id":it.id},IG);
+      const a={class:"sh",fill:c[1],"fill-opacity":c[2],stroke:c[1],"stroke-width":1.2,"stroke-dasharray":c[3],"vector-effect":"non-scaling-stroke"};
+      let cx=it.w/2,cy=it.h/2,bw=it.w,bh=it.h;
+      if(it.shape==="ellipse")el("ellipse",Object.assign({cx,cy,rx:it.w/2,ry:it.h/2},a),g);
+      else if(it.shape==="poly"){el("polygon",Object.assign({points:it.pts.map(p=>p.join(",")).join(" ")},a),g);
+        cx=it.pts.reduce((s,p)=>s+p[0],0)/it.pts.length;cy=it.pts.reduce((s,p)=>s+p[1],0)/it.pts.length;const zb=zbox(it);bw=zb.w;bh=zb.h}
+      else el("rect",Object.assign({width:it.w,height:it.h,rx:.3},a),g);
+      const st=(it.staff||[]).map(id=>empById[id]?empById[id].name:"").filter(Boolean);
+      const fs=Math.max(.3,Math.min(1,bh*.32,bw/Math.max(4,it.label.length)*1.7));
+      tx(g,cx,cy+(st.length?0:fs*.35),it.label,fs);
+      if(st.length)tx(g,cx,cy+fs*1.1,st.length<=2?st.join(", "):st.length+" staff",fs*.7,"#cfcaff");
+      g.addEventListener("pointerdown",e=>startDrag(e,it));}
+    else{const g=el("g",{class:"it"+(it.id===sel?" sel":""),transform:`translate(${it.x},${it.y}) rotate(${it.rot||0})`,"data-id":it.id},IG);
+      it.seats.forEach((s,i)=>{const[cx,cy]=chairPos(it,i),[f,st]=chairCol(it,i);
+        el("circle",{class:"ch",cx,cy,r:.3,fill:f,stroke:st,"stroke-width":1.4,"vector-effect":"non-scaling-stroke",style:`animation-delay:${Math.min(idx*6+i*15,500)}ms`},g)});
+      const d=dims(it),a={class:"sh",fill:"#4a90d9","fill-opacity":.16,stroke:"#4a90d9","stroke-width":1.2,"vector-effect":"non-scaling-stroke"};
+      if(d.e)el("ellipse",Object.assign({rx:d.tx,ry:d.ty},a),g);else el("rect",Object.assign({x:-d.tx,y:-d.ty,width:2*d.tx,height:2*d.ty,rx:.15},a),g);
+      tx(g,0,.28,String(it.num),Math.min(.8,d.ty*1.2+.2),"#e8eef5",{transform:`rotate(${-(it.rot||0)})`});
+      g.addEventListener("pointerdown",e=>startDrag(e,it));}});}
+function handleTarget(){if(sel==="hall"&&S.hall.type==="poly")return{pts:S.hall.pts,ox:0,oy:0,hall:true};
+  const z=sel!=null&&sel!=="hall"?find(sel):null;if(z&&z.k==="z"&&z.shape==="poly")return{pts:z.pts,ox:z.x,oy:z.y,z};return null}
+function drawHandles(){HD.innerHTML="";const t=handleTarget();if(!t)return;const r=vb.w/110;
+  t.pts.forEach((p,i)=>{const c=el("circle",{cx:p[0]+t.ox,cy:p[1]+t.oy,r,fill:i===vtx?"#e0a526":"#0b1e35",stroke:"#e0a526","stroke-width":2,"vector-effect":"non-scaling-stroke",style:"cursor:pointer"},HD);
+    c.addEventListener("pointerdown",e=>{e.stopPropagation();vtx=i;drag={v:1,t,i,moved:false};svg.setPointerCapture(e.pointerId);drawHandles();panel()})});}
 function stats(){const T=tables();let cap=0,seat=0,arr=0,nohost=0;
-  T.forEach(t=>{cap+=t.chairs-1;if(!t.seats[0])nohost++;t.seats.forEach((s,i)=>{if(i>0&&s){seat++;if(attById[s.a]&&attById[s.a].arrived)arr++}})});
+  T.forEach(t=>{cap+=Math.max(0,t.chairs-1);if(!t.seats[0])nohost++;t.seats.forEach((s,i)=>{if(i>0&&s){seat++;if(attById[s.a]&&attById[s.a].arrived)arr++}})});
+  const staff=zones().reduce((n,z)=>n+(z.staff||[]).length,0);
   $("stats").innerHTML=`<div class="stat"><b>${T.length}</b><span>Tables</span></div><div class="stat"><b>${seat} / ${cap}</b><span>Seated / capacity</span></div>
   <div class="stat"><b>${ATT.length-seat}</b><span>Unseated guests</span></div><div class="stat"><b>${arr}</b><span>Arrived</span></div>
-  ${nohost?`<div id="warn">${nohost} table${nohost>1?"s":""} without a host</div>`:""}`;}
+  <div class="note">${nohost?`${nohost} table${nohost>1?"s":""} without a host · `:""}${staff} staff stationed in zones</div>`;}
 
-function panel(){const P=$("panel"),it=sel!=null?find(sel):null;
+/* ---------- side panel ---------- */
+function cornerButtons(){return`<div style="display:flex;gap:6px;margin-bottom:10px"><button id="vadd">+ Corner</button><button id="vdel">− Corner</button></div>`}
+function bindCorners(){const add=$("vadd"),del=$("vdel");if(!add)return;
+  add.onclick=()=>{const t=handleTarget();if(!t)return;if(vtx<0){flash("Select a corner first");return}
+    const a=t.pts[vtx],b=t.pts[(vtx+1)%t.pts.length];t.pts.splice(vtx+1,0,[snap((a[0]+b[0])/2),snap((a[1]+b[1])/2)]);vtx++;refresh()};
+  del.onclick=()=>{const t=handleTarget();if(!t)return;if(vtx<0){flash("Select a corner first");return}
+    if(t.pts.length<=3){flash("A shape needs at least 3 corners");return}t.pts.splice(vtx,1);vtx=-1;refresh()};}
+function panel(){const P=$("panel");
+  if(sel==="hall"){const h=S.hall;
+    P.innerHTML=`<h2>Hall shape</h2><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
+      ${[["rect","Rectangle"],["L","L-shape"],["oval","Oval"],["custom","Custom corners"]].map(([v,t])=>`<button data-p="${v}" class="${h.preset===v?"on":""}">${t}</button>`).join("")}</div>
+      ${h.preset!=="custom"?`<div style="display:flex;gap:8px;margin-bottom:10px"><label class="f">Width (m)<input id="hw" type="number" min="10" max="300" step="1" value="${h.W}"></label>
+        <label class="f">Length (m)<input id="hl" type="number" min="10" max="300" step="1" value="${h.L}"></label></div>`
+      :`<p class="sub" style="line-height:1.5">Drag the amber corner handles on the map. Click a corner to select it, then add a corner after it or remove it.</p>${cornerButtons()}`}
+      <p class="sub">Tables and zones stay where they are when you change the hall.</p><button id="hdone" style="margin-top:10px">Done</button>`;
+    P.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{const v=b.dataset.p;if(v==="custom")toCustom();else applyHall(v,h.W,h.L);vtx=-1;fit();refresh()});
+    if($("hw"))$("hw").onchange=$("hl").onchange=()=>{const W=+$("hw").value,L=+$("hl").value;
+      if(!(W>=10&&W<=300&&L>=10&&L<=300)){flash("Width and length must be 10–300 m");return}applyHall(h.preset,W,L);$("iW").value=W;$("iL").value=L;fit();refresh()};
+    bindCorners();$("hdone").onclick=()=>{sel=null;vtx=-1;refresh()};return}
+  const it=sel!=null?find(sel):null;
   if(!it){P.innerHTML=`<h2>Unseated guests</h2><input id="gq" placeholder="Search name or company" style="width:100%;margin-bottom:8px"><div id="gl"></div>
-    <p class="sub" style="margin-top:12px;line-height:1.5">Click a table to seat guests. Drag tables and zones to move them. Scroll to zoom, drag empty space to pan.</p>`;guestList(null);return}
-  if(it.k==="z"){P.innerHTML=`<h2>Zone</h2>
-    <label class="f" style="margin-bottom:8px">Name<input id="zl" value="${esc(it.label)}"></label>
-    <div style="display:flex;gap:8px;margin-bottom:8px"><label class="f">Width (m)<input id="zw" type="number" min="1" max="200" step="0.5" value="${it.w}"></label>
-    <label class="f">Depth (m)<input id="zh" type="number" min="1" max="200" step="0.5" value="${it.h}"></label></div>
-    <label class="f" style="margin-bottom:12px">Type<select id="zk"><option value="stage">Stage / main</option><option value="display">Display / screen</option><option value="area">Area</option></select></label>
-    <button id="zdel">Remove zone</button>`;
-    $("zk").value=it.kind;
+    <p class="sub" style="margin-top:12px;line-height:1.5">Click a table to seat guests, or a zone to station staff. Drag to move. Scroll to zoom, drag empty space to pan.</p>`;guestList(null);return}
+  if(it.k==="z"){it.staff=it.staff||[];
+    P.innerHTML=`<h2>Zone</h2>
+      <label class="f" style="margin-bottom:8px">Name<input id="zl" value="${esc(it.label)}"></label>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <label class="f" style="flex:1">Type<select id="zk">${Object.entries(KINDS).map(([k,v])=>`<option value="${k}">${v[0]}</option>`).join("")}</select></label>
+        <label class="f" style="flex:1">Shape<select id="zs"><option value="rect">Rectangle</option><option value="ellipse">Oval</option><option value="poly">Custom corners</option></select></label></div>
+      ${it.shape==="poly"?`<p class="sub" style="line-height:1.5">Drag the amber handles to shape the zone.</p>${cornerButtons()}`
+      :`<div style="display:flex;gap:8px;margin-bottom:8px"><label class="f">Width (m)<input id="zw" type="number" min="0.5" max="300" step="0.5" value="${it.w}"></label>
+        <label class="f">Depth (m)<input id="zh" type="number" min="0.5" max="300" step="0.5" value="${it.h}"></label>
+        <label class="f">Rotate (°)<input id="zr" type="number" min="0" max="345" step="15" value="${it.rot||0}"></label></div>`}
+      <h2 style="margin-top:14px">Stationed here</h2>
+      <div>${it.staff.map(id=>`<span class="chip">${esc(empById[id]?empById[id].name:id)}<button data-s="${id}" title="Remove">✕</button></span>`).join("")||'<p class="sub">No one yet.</p>'}</div>
+      <select id="zadd" style="width:100%;margin:6px 0 14px"><option value="">+ Add person</option>
+        ${EMP.filter(u=>!it.staff.includes(u.id)).map(u=>{const t=hostOf(u.id),z=stationOf(u.id);return`<option value="${u.id}">${esc(u.name)}${t?` (hosts table ${t})`:""}${z?` (at ${esc(z)})`:""}</option>`}).join("")}</select>
+      <button id="zdel">Remove zone</button>`;
+    $("zk").value=it.kind;$("zs").value=it.shape;
     $("zl").oninput=e=>{it.label=e.target.value;drawItems();save()};
-    $("zw").onchange=e=>{it.w=Math.max(1,+e.target.value||1);refresh()};
-    $("zh").onchange=e=>{it.h=Math.max(1,+e.target.value||1);refresh()};
     $("zk").onchange=e=>{it.kind=e.target.value;refresh()};
-    $("zdel").onclick=()=>{S.items=S.items.filter(x=>x!==it);sel=null;refresh()};return}
-  const h=it.seats[0];
-  P.innerHTML=`<div style="display:flex;gap:6px;align-items:center;margin-bottom:10px"><h2 style="margin:0;flex:1">Table ${it.num}</h2>
-    <select id="tsh"><option value="round">Round</option><option value="square">Square</option></select>
-    <select id="tch">${[4,6,8,10,12].map(n=>`<option value="${n}">${n} chairs</option>`).join("")}</select>
-    <button class="x" id="tdel" title="Remove table">✕</button></div>
+    $("zs").onchange=e=>{const v=e.target.value,b=zbox(it);
+      if(v==="poly"){it.pts=it.shape==="ellipse"?Array.from({length:12},(_,k)=>{const a=k*Math.PI/6;return[+(it.w/2+Math.cos(a)*it.w/2).toFixed(1),+(it.h/2+Math.sin(a)*it.h/2).toFixed(1)]}):rectPts(it.w,it.h);it.rot=0}
+      else if(it.shape==="poly"){it.x=+b.x.toFixed(1);it.y=+b.y.toFixed(1);it.w=+b.w.toFixed(1);it.h=+b.h.toFixed(1);it.pts=null}
+      it.shape=v;vtx=-1;refresh()};
+    if($("zw")){$("zw").onchange=e=>{it.w=Math.max(.5,+e.target.value||.5);refresh()};$("zh").onchange=e=>{it.h=Math.max(.5,+e.target.value||.5);refresh()};
+      $("zr").onchange=e=>{it.rot=((Math.round(+e.target.value/15)*15)%360+360)%360;refresh()}}
+    bindCorners();
+    P.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{it.staff=it.staff.filter(x=>x!==b.dataset.s);refresh()});
+    $("zadd").onchange=e=>{if(e.target.value){it.staff.push(e.target.value);refresh()}};
+    $("zdel").onclick=()=>{S.items=S.items.filter(x=>x!==it);sel=null;vtx=-1;refresh()};return}
+  const h=it.seats[0],hz=h?stationOf(h.u):null;
+  P.innerHTML=`<div style="display:flex;gap:6px;align-items:center;margin-bottom:8px"><h2 style="margin:0;flex:1">Table ${it.num}</h2><button class="x" id="tdel" title="Remove table">✕</button></div>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <label class="f" style="flex:1">Shape<select id="tsh"><option value="round">Round</option><option value="square">Square</option><option value="oval">Oval</option><option value="long">Long</option></select></label>
+      <label class="f">Chairs<input id="tch" type="number" min="1" max="40" step="1" value="${it.chairs}"></label>
+      <label class="f">Rotate (°)<input id="trot" type="number" min="0" max="345" step="15" value="${it.rot||0}"></label></div>
     <div class="row"><span class="dot" style="background:${h?"#8f86e8":"transparent"};border-color:#8f86e8"></span><span class="sub" style="width:44px">Seat 1</span>
     <select id="hEmp" style="flex:1;min-width:0"><option value="">Choose host</option>${EMP.map(u=>`<option value="${u.id}"${h&&h.u===u.id?" selected":""}>${esc(u.name)}</option>`).join("")}</select>
     <select id="hRole">${ROLES.map(r=>`<option${h&&h.role===r?" selected":""}>${r}</option>`).join("")}</select></div>
+    ${hz?`<p class="sub" style="margin:4px 0 0 6px;color:var(--amber)">This host is also stationed at ${esc(hz)}.</p>`:""}
     <div id="seats"></div>
     <h2 style="margin-top:16px">Add guests</h2><input id="gq" placeholder="Search name or company" style="width:100%;margin-bottom:8px"><div id="gl"></div>`;
-  $("tsh").value=it.shape;$("tch").value=it.chairs;
+  $("tsh").value=it.shape;
   $("seats").innerHTML=it.seats.map((s,i)=>{if(i===0)return"";const a=s&&attById[s.a];
     return`<div class="row"><span class="dot" style="background:${a?(a.arrived?"#4aa564":"#e0a526"):"transparent"};border-color:${a?(a.arrived?"#2f7a45":"#a8780f"):"#4a90d9"}"></span>
     <span class="sub" style="width:44px">Seat ${i+1}</span><span class="nm">${a?esc(a.name)+` <span class="sub">${esc(a.company)}</span>`:'<span class="sub">Empty</span>'}</span>
@@ -193,10 +292,11 @@ function panel(){const P=$("panel"),it=sel!=null?find(sel):null;
   $("hEmp").onchange=e=>{it.seats[0]=e.target.value?{u:e.target.value,role:$("hRole").value}:null;refresh()};
   $("hRole").onchange=e=>{if(it.seats[0]){it.seats[0].role=e.target.value;save()}};
   $("tsh").onchange=e=>{it.shape=e.target.value;refresh()};
-  $("tch").onchange=e=>{const n=+e.target.value;it.chairs=n;it.seats=Array.from({length:n},(_,i)=>it.seats[i]||null);refresh()};
+  $("tch").onchange=e=>{const n=Math.round(+e.target.value);if(!(n>=1&&n<=40)){flash("Chairs must be 1–40");e.target.value=it.chairs;return}
+    it.chairs=n;it.seats=Array.from({length:n},(_,i)=>it.seats[i]||null);refresh()};
+  $("trot").onchange=e=>{it.rot=((Math.round(+e.target.value/15)*15)%360+360)%360;refresh()};
   $("tdel").onclick=()=>{S.items=S.items.filter(x=>x!==it);sel=null;refresh()};
   guestList(it);}
-
 function guestList(t){const q=$("gq"),box=$("gl");
   const run=()=>{const s=q.value.trim().toLowerCase();
     const list=pool().filter(a=>!s||(a.name+" "+a.company).toLowerCase().includes(s)).slice(0,80);
@@ -204,48 +304,53 @@ function guestList(t){const q=$("gq"),box=$("gl");
       :'<p class="sub">No unseated guests match.</p>';
     box.querySelectorAll("[data-a]").forEach(r=>r.onclick=()=>{
       if(!t){flash("Select a table first");return}
-      const i=t.seats.findIndex((x,k)=>k>0&&!x);
-      if(i<0){flash(`Table ${t.num} is full`);return}
+      const i=t.seats.findIndex((x,k)=>k>0&&!x);if(i<0){flash(`Table ${t.num} is full`);return}
       t.seats[i]={a:r.dataset.a};const keep=q.value;refresh();const nq=$("gq");if(nq){nq.value=keep;nq.dispatchEvent(new Event("input"))}});};
   q.addEventListener("input",run);run();}
 
-function refresh(){drawHall();drawItems();stats();panel();save()}
+function refresh(){drawHall();drawItems();drawHandles();stats();panel();save()}
 
-function setVB(){svg.setAttribute("viewBox",`${vb.x} ${vb.y} ${vb.w} ${vb.h}`)}
-function fit(){const r=(svg.clientWidth/svg.clientHeight)||1.6,pad=Math.max(S.W,S.L)*.06,w=S.W+pad*2,h=S.L+pad*2;
-  vb=w/h>r?{x:-pad,y:-pad-(w/r-h)/2,w,h:w/r}:{x:-pad-(h*r-w)/2,y:-pad,w:h*r,h};setVB()}
+/* ---------- view and pointer ---------- */
+function setVB(){svg.setAttribute("viewBox",`${vb.x} ${vb.y} ${vb.w} ${vb.h}`);drawHandles()}
+function fit(){const b=hb(),r=(svg.clientWidth/svg.clientHeight)||1.6,pad=Math.max(b.x1-b.x0,b.y1-b.y0)*.07,w=b.x1-b.x0+pad*2,h=b.y1-b.y0+pad*2;
+  vb=w/h>r?{x:b.x0-pad,y:b.y0-pad-(w/r-h)/2,w,h:w/r}:{x:b.x0-pad-(h*r-w)/2,y:b.y0-pad,w:h*r,h};setVB()}
 function zoomAt(px,py,f){vb.x=px-(px-vb.x)*f;vb.y=py-(py-vb.y)*f;vb.w*=f;vb.h*=f;setVB()}
 function pt(e){const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())}
-
 function startDrag(e,it){e.stopPropagation();const p=pt(e);drag={it,dx:p.x-it.x,dy:p.y-it.y,moved:false};
-  if(sel!==it.id){sel=it.id;drawItems();panel()}svg.setPointerCapture(e.pointerId)}
+  if(sel!==it.id){sel=it.id;vtx=-1;drawHall();drawItems();drawHandles();panel()}svg.setPointerCapture(e.pointerId)}
 svg.addEventListener("pointerdown",e=>{if(drag)return;pan={x:e.clientX,y:e.clientY,vx:vb.x,vy:vb.y,moved:false};svg.setPointerCapture(e.pointerId)});
 svg.addEventListener("pointermove",e=>{
-  if(drag){const p=pt(e),it=drag.it;it.x=Math.round((p.x-drag.dx)*2)/2;it.y=Math.round((p.y-drag.dy)*2)/2;drag.moved=true;
-    const g=IG.querySelector(`[data-id="${it.id}"]`);if(g)g.setAttribute("transform",`translate(${it.x},${it.y})`)}
+  if(drag&&drag.v){const p=pt(e),t=drag.t;
+    if(t.hall&&S.hall.preset!=="custom")S.hall.preset="custom";
+    t.pts[drag.i]=[snap(p.x-t.ox),snap(p.y-t.oy)];drag.moved=true;drawHall();drawItems();drawHandles()}
+  else if(drag){const p=pt(e),it=drag.it;it.x=snap(p.x-drag.dx);it.y=snap(p.y-drag.dy);drag.moved=true;drawItems();drawHandles()}
   else if(pan){const s=vb.w/svg.clientWidth,dx=e.clientX-pan.x,dy=e.clientY-pan.y;if(Math.abs(dx)+Math.abs(dy)>3)pan.moved=true;
     vb.x=pan.vx-dx*s;vb.y=pan.vy-dy*s;setVB()}});
-svg.addEventListener("pointerup",()=>{if(drag&&drag.moved)save();if(pan&&!pan.moved&&sel!=null){sel=null;drawItems();panel()}drag=null;pan=null});
+svg.addEventListener("pointerup",()=>{if(drag&&drag.moved){save();if(drag.v)panel()}
+  if(pan&&!pan.moved&&sel!=null&&sel!=="hall"){sel=null;vtx=-1;refresh()}drag=null;pan=null});
 svg.addEventListener("wheel",e=>{e.preventDefault();const p=pt(e);zoomAt(p.x,p.y,e.deltaY>0?1.12:.89)},{passive:false});
 
+/* ---------- toolbar ---------- */
 $("bGen").onclick=generate;
-$("bT").onclick=()=>{const t=mkTable(+(vb.x+vb.w/2).toFixed(1),+(vb.y+vb.h/2).toFixed(1),$("iS").value,+$("iC").value,nextNum());S.items.push(t);sel=t.id;refresh()};
-$("bZ").onclick=()=>{const z=mkZone("New zone",+(vb.x+vb.w/2-3).toFixed(1),+(vb.y+vb.h/2-2).toFixed(1),6,4,"area");S.items.push(z);sel=z.id;refresh()};
+$("bHall").onclick=()=>{sel="hall";vtx=-1;refresh()};
+$("bT").onclick=()=>{const ch=Math.round(+$("iC").value);if(!(ch>=1&&ch<=40)){flash("Chairs must be 1–40");return}
+  const t=mkTable(snap(vb.x+vb.w/2),snap(vb.y+vb.h/2),$("iS").value,ch,nextNum());S.items.push(t);sel=t.id;refresh()};
+$("bZ").onclick=()=>{const z=mkZone("New zone",vb.x+vb.w/2-3,vb.y+vb.h/2-2,6,4,"area");S.items.push(z);sel=z.id;refresh()};
 $("bAuto").onclick=()=>{const p=pool().sort((a,b)=>a.company.localeCompare(b.company));let k=0;
   tables().sort((a,b)=>a.num-b.num).forEach(t=>{for(let i=1;i<t.chairs;i++)if(!t.seats[i]&&k<p.length)t.seats[i]={a:p[k++].id}});
   refresh();flash(k?`Seated ${k} guests`:"No empty seats or no unseated guests")};
-$("bClear").onclick=()=>{if(!confirm("Remove all guests from tables? Hosts stay."))return;tables().forEach(t=>t.seats=t.seats.map((s,i)=>i===0?s:null));refresh()};
+$("bClear").onclick=()=>{if(!confirm("Remove all guests from tables? Hosts and zone staff stay."))return;tables().forEach(t=>t.seats=t.seats.map((s,i)=>i===0?s:null));refresh()};
 $("bZi").onclick=()=>zoomAt(vb.x+vb.w/2,vb.y+vb.h/2,.8);
 $("bZo").onclick=()=>zoomAt(vb.x+vb.w/2,vb.y+vb.h/2,1.25);
 $("bFit").onclick=fit;
 $("bExp").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,1)],{type:"application/json"}));a.download="cid-layout.json";a.click()};
 $("bImp").onclick=()=>$("fImp").click();
 $("fImp").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
-  r.onload=()=>{try{const o=JSON.parse(r.result);if(!Array.isArray(o.items))throw 0;S=o;sel=null;fit();refresh();flash("Layout imported")}catch(x){flash("That file isn't a valid layout")}};r.readAsText(f);e.target.value=""};
+  r.onload=()=>{try{const o=JSON.parse(r.result);if(!o.hall||!Array.isArray(o.items))throw 0;S=o;sel=null;vtx=-1;fit();refresh();flash("Layout imported")}catch(x){flash("That file isn't a valid layout")}};r.readAsText(f);e.target.value=""};
 window.addEventListener("resize",fit);
 
-$("iW").value=S.W;$("iL").value=S.L;
-if(!S.items.length){S.items=[];generate()}else{fit();refresh()}
+$("iW").value=S.hall.W||40;$("iL").value=S.hall.L||28;
+if(!S.items.length)generate();else{fit();refresh()}
 </script>
 </body>
 </html>
