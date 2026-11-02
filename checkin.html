@@ -129,7 +129,7 @@ const FLOW_URL  = "https://f0e3c06ec378e576bef89b03e45d43.81.environment.api.pow
 const SCOPE = "https://service.flow.microsoft.com//.default";
 /* ========================================================= */
 
-const msal = new msal.PublicClientApplication({
+const msalApp = new msal.PublicClientApplication({
   auth:{ clientId:CLIENT_ID, authority:"https://login.microsoftonline.com/"+TENANT_ID,
          redirectUri:location.origin+location.pathname },
   cache:{ cacheLocation:"sessionStorage" }
@@ -139,10 +139,10 @@ let account = null, scanner = null, busy = false, started = false;
 /* ---------- sign-in ---------- */
 async function initAuth(){
   try{
-    const r = await msal.handleRedirectPromise();
+    const r = await msalApp.handleRedirectPromise();
     if(r && r.account) account = r.account;
   }catch(e){ gateMsg(explain(e)); }
-  if(!account){ const all = msal.getAllAccounts(); if(all.length) account = all[0]; }
+  if(!account){ const all = msalApp.getAllAccounts(); if(all.length) account = all[0]; }
   account ? enterApp() : showGate();
 }
 function showGate(){
@@ -152,7 +152,7 @@ function showGate(){
   document.getElementById("who").textContent="";
 }
 function enterApp(){
-  msal.setActiveAccount(account);
+  msalApp.setActiveAccount(account);
   document.getElementById("gate").style.display="none";
   document.getElementById("app").style.display="flex";
   document.getElementById("who").textContent = account.name || account.username;
@@ -160,10 +160,10 @@ function enterApp(){
   if(!started){ started=true; startScanner(); }
 }
 document.getElementById("signIn").addEventListener("click",()=>{
-  msal.loginRedirect({ scopes:[SCOPE] });
+  msalApp.loginRedirect({ scopes:[SCOPE] }).catch(e=>gateMsg(explain(e)));
 });
 document.getElementById("signOut").addEventListener("click",()=>{
-  msal.logoutRedirect({ account:account, postLogoutRedirectUri:location.origin+location.pathname });
+  msalApp.logoutRedirect({ account:account, postLogoutRedirectUri:location.origin+location.pathname });
 });
 function gateMsg(t){ document.getElementById("gateMsg").textContent=t; }
 function explain(e){
@@ -175,11 +175,11 @@ function explain(e){
 
 async function getToken(){
   try{
-    const r = await msal.acquireTokenSilent({ scopes:[SCOPE], account:account });
+    const r = await msalApp.acquireTokenSilent({ scopes:[SCOPE], account:account });
     return r.accessToken;
   }catch(e){
     if(e instanceof msal.InteractionRequiredAuthError || (e.errorCode||"").includes("interaction")){
-      await msal.acquireTokenRedirect({ scopes:[SCOPE], account:account });
+      await msalApp.acquireTokenRedirect({ scopes:[SCOPE], account:account });
     }
     throw e;
   }
