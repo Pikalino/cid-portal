@@ -59,7 +59,16 @@ h1 span{color:var(--y)}
 .card.soon .ico{background:var(--soft);color:var(--g)}
 .card.soon .go{color:var(--g)}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}}
-@media (max-width:600px){.hero{grid-template-columns:1fr;padding:30px 24px 46px}.art{display:none}.cards{grid-template-columns:1fr}}
+@media (max-width:640px){
+  .hero{grid-template-columns:1fr;padding:30px 26px 44px;min-height:0}
+  .art{display:none}
+  h1{font-size:34px}
+  .cards{grid-template-columns:1fr;gap:10px;margin-top:12px}
+  .card{flex-direction:row;align-items:center;gap:14px;padding:14px 16px}
+  .card h3{margin:0;font-size:17px}
+  .card p{display:none}
+  .card .go{margin:0 0 0 auto}
+}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
