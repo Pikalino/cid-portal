@@ -58,6 +58,12 @@ h1 span{color:var(--y)}
 .card.soon:hover::after{width:0}.card.soon:hover .ico{transform:none}
 .card.soon .ico{background:#2a2a2a;color:#777}
 .card.soon .go{color:var(--g)}
+.card.hub:hover{transform:none;box-shadow:none;border-color:#333}
+.card.hub:hover::after{width:0}.card.hub:hover .ico{transform:none}
+.depts{display:grid;gap:6px;margin-top:6px}
+.depts a{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:8px;background:#232323;border:1px solid #333;color:#fff;text-decoration:none;font-size:13px;font-weight:600;transition:border-color .2s,transform .2s}
+.depts a:hover{border-color:var(--y);transform:translateX(3px)}
+.depts a span{color:var(--y)}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}}
 @media (max-width:640px){
   .hero{grid-template-columns:1fr;padding:30px 26px 44px;min-height:0}
@@ -68,6 +74,7 @@ h1 span{color:var(--y)}
   .card h3{margin:0;font-size:17px}
   .card p{display:none}
   .card .go{margin:0 0 0 auto}
+  .card.hub{flex-direction:column;align-items:stretch}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -117,10 +124,15 @@ h1 span{color:var(--y)}
       <h3>Events</h3><p>QR check-in, seat planner and event-day tools.</p>
       <span class="go">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
     </a>
-    <div class="card soon" style="--d:.35s">
+        <div class="card hub" style="--d:.35s">
       <div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h5v18H6a2 2 0 0 1-2-2zM13 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5z"/></svg></div>
-      <h3>Resources</h3><p>Files and reports for each department.</p>
-      <span class="go">Coming soon</span>
+      <h3>Resources</h3>
+      <div class="depts">
+        <a data-link="r1">CI Prime CAT Sales <span>→</span></a>
+        <a data-link="r2">Energy &amp; Transportation <span>→</span></a>
+        <a data-link="r3">Analytics &amp; Support <span>→</span></a>
+        <a data-link="r4">Marketing <span>→</span></a>
+      </div>
     </div>
   </section>
 </div>
@@ -129,7 +141,11 @@ h1 span{color:var(--y)}
 const SITE = "https://barloworldmn.sharepoint.com/teams/CISharepoint";
 const LINKS = {
   crm: "https://barloworldmn.sharepoint.com/teams/CISharepoint/SitePages/CRM.aspx",
-  events: "https://barloworldmn.sharepoint.com/teams/CISharepoint/SitePages/Events.aspx"
+  events: "https://barloworldmn.sharepoint.com/teams/CISharepoint/SitePages/Events.aspx",
+  r1: "https://barloworldmn.sharepoint.com/teams/CISharepoint/CI%20Prime%20CAT%20Sales/Forms/Files.aspx",
+  r2: "https://barloworldmn.sharepoint.com/teams/CISharepoint/Energy%20%20Transportation/Forms/Files.aspx",
+  r3: "https://barloworldmn.sharepoint.com/teams/CISharepoint/Analytics%20%20Support/Forms/Files.aspx",
+  r4: "https://barloworldmn.sharepoint.com/teams/CISharepoint/Marketing/Forms/Files.aspx"
 };
 /* ====================== */
 document.querySelectorAll("[data-link]").forEach(a=>{a.href=LINKS[a.dataset.link]||"#";a.target="_top"});
