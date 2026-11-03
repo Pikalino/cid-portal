@@ -10,7 +10,7 @@
 <style>
 :root{--y:#FFCD11;--k:#111111;--k2:#1c1c1c;--g:#6b6b6b;--line:#e6e6e6;--soft:#f4f4f4}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{background:#fff;color:var(--k);font-family:"Barlow","Segoe UI",system-ui,sans-serif}
+html,body{background:transparent;color:var(--k);font-family:"Barlow","Segoe UI",system-ui,sans-serif}
 .wrap{width:100%;padding:0 0 20px}
 .hero{position:relative;overflow:hidden;border-radius:18px;background:var(--k);color:#fff;display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:20px;
   padding:44px 44px 58px;min-height:520px;animation:rise .7s ease both}
@@ -41,22 +41,22 @@ h1 span{color:var(--y)}
 .ground{stroke-dasharray:8 10;animation:roll 1.6s linear infinite}
 @keyframes roll{to{stroke-dashoffset:-36}}
 .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:16px}
-.card{position:relative;overflow:hidden;display:flex;flex-direction:column;padding:22px;border-radius:16px;border:1px solid var(--line);background:#fff;color:inherit;text-decoration:none;
+.card{position:relative;overflow:hidden;display:flex;flex-direction:column;padding:22px;border-radius:16px;border:1px solid #333;background:#1a1a1a;color:#fff;text-decoration:none;
   transition:transform .25s,box-shadow .25s,border-color .25s;animation:rise .6s ease both;animation-delay:var(--d)}
-.card:hover{transform:translateY(-5px);box-shadow:0 16px 32px rgba(0,0,0,.10);border-color:var(--k)}
+.card:hover{transform:translateY(-5px);box-shadow:0 16px 32px rgba(0,0,0,.10);border-color:var(--y)}
 .card::after{content:"";position:absolute;left:0;bottom:0;height:4px;width:0;background:var(--y);transition:width .35s}
 .card:hover::after{width:100%}
 .ico{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:var(--y);color:var(--k);transition:transform .3s}
 .card:hover .ico{transform:rotate(-6deg) scale(1.08)}
 .card h3{font-size:20px;font-weight:700;margin:16px 0 6px}
-.card p{font-size:14px;line-height:1.5;color:var(--g);flex:1}
-.go{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-size:14px;font-weight:700;color:var(--k)}
+.card p{font-size:14px;line-height:1.5;color:#a8a8a8;flex:1}
+.go{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-size:14px;font-weight:700;color:#fff}
 .go svg{transition:transform .25s}
 .card:hover .go svg{transform:translateX(4px)}
 .card.soon{cursor:default;opacity:.5}
-.card.soon:hover{transform:none;box-shadow:none;border-color:var(--line)}
+.card.soon:hover{transform:none;box-shadow:none;border-color:#333}
 .card.soon:hover::after{width:0}.card.soon:hover .ico{transform:none}
-.card.soon .ico{background:var(--soft);color:var(--g)}
+.card.soon .ico{background:#2a2a2a;color:#777}
 .card.soon .go{color:var(--g)}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}}
 @media (max-width:640px){
