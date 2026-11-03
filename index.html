@@ -13,7 +13,7 @@
 html,body{background:#fff;color:var(--k);font-family:"Barlow","Segoe UI",system-ui,sans-serif}
 .wrap{width:100%;padding:0 0 20px}
 .hero{position:relative;overflow:hidden;border-radius:18px;background:var(--k);color:#fff;display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:20px;
-  padding:44px 44px 58px;min-height:400px;animation:rise .7s ease both}
+  padding:44px 44px 58px;min-height:520px;animation:rise .7s ease both}
 .hero::before{content:"";position:absolute;inset:0;pointer-events:none;
   background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);
   background-size:32px 32px;animation:pan 50s linear infinite}
@@ -25,9 +25,9 @@ html,body{background:#fff;color:var(--k);font-family:"Barlow","Segoe UI",system-
 @keyframes grow{from{transform:scaleX(0)}}
 .eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.7)}
 .eyebrow i{width:26px;height:4px;background:var(--y);border-radius:2px}
-h1{font-size:clamp(34px,4.2vw,56px);line-height:1.02;font-weight:800;margin:16px 0 14px;letter-spacing:-.01em}
+h1{font-size:clamp(40px,5vw,68px);line-height:1.02;font-weight:800;margin:16px 0 14px;letter-spacing:-.01em}
 h1 span{color:var(--y)}
-.lead{font-size:17px;line-height:1.55;color:rgba(255,255,255,.72);max-width:500px}
+.lead{font-size:19px;line-height:1.55;color:rgba(255,255,255,.72);max-width:500px}
 .search{display:flex;align-items:center;gap:10px;margin-top:26px;max-width:480px;background:#fff;border-radius:12px;padding:6px 6px 6px 16px;
   box-shadow:0 0 0 0 rgba(255,205,17,.0);transition:box-shadow .25s}
 .search:focus-within{box-shadow:0 0 0 4px rgba(255,205,17,.45)}
