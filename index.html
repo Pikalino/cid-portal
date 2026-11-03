@@ -148,7 +148,7 @@ const LINKS = {
   r4: "https://barloworldmn.sharepoint.com/teams/CISharepoint/Marketing/Forms/Files.aspx"
 };
 /* ====================== */
-document.querySelectorAll("[data-link]").forEach(a=>{a.href=LINKS[a.dataset.link]||"#";a.target="_top"});
+document.querySelectorAll("[data-link]").forEach(a=>{   a.href=LINKS[a.dataset.link]||"#";   if(a.dataset.link.startsWith("r")){a.target="_blank";a.rel="noopener"}else{a.target="_top"} });
 document.getElementById("sform").action = SITE + "/_layouts/15/search.aspx/siteall";
 </script>
 </body>
