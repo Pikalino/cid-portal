@@ -13,16 +13,17 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;background:var(--k);color:#fff;font-family:"Barlow","Segoe UI",system-ui,sans-serif;overflow:hidden}
 body{display:flex;flex-direction:column}
-header{display:flex;align-items:center;gap:22px;padding:14px 24px;background:var(--p);border-bottom:3px solid var(--y)}
+header{display:flex;align-items:center;gap:18px;padding:14px 24px;background:var(--p);border-bottom:3px solid var(--y)}
 .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:.06em}
-.brand i{width:12px;height:12px;border-radius:50%;background:#e24b4a;box-shadow:0 0 0 0 rgba(226,75,74,.7);animation:ping 1.6s infinite}
-@keyframes ping{70%{box-shadow:0 0 0 12px rgba(226,75,74,0)}100%{box-shadow:0 0 0 0 rgba(226,75,74,0)}}
+.brand i{width:12px;height:12px;border-radius:50%;background:#e24b4a;animation:ping 1.6s infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(226,75,74,.7)}70%{box-shadow:0 0 0 12px rgba(226,75,74,0)}100%{box-shadow:0 0 0 0 rgba(226,75,74,0)}}
 select,button{background:#222;color:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 12px;font:inherit;font-size:14px;cursor:pointer}
 button.pri{background:var(--y);border-color:var(--y);color:#111;font-weight:700}
+button.on{background:var(--y);border-color:var(--y);color:#111}
 .sp{flex:1}
-.count{min-width:300px}
+.count{min-width:280px}
 .count .n{display:flex;align-items:baseline;gap:10px}
-.count b{font-size:46px;line-height:1;font-weight:800;color:var(--y);transition:transform .3s}
+.count b{font-size:46px;line-height:1;font-weight:800;color:var(--y);transition:transform .3s;display:inline-block}
 .count b.bump{transform:scale(1.15)}
 .count span{font-size:18px;color:#ccc}
 .bar{height:8px;border-radius:4px;background:#2a2a2a;margin-top:8px;overflow:hidden}
@@ -30,16 +31,32 @@ button.pri{background:var(--y);border-color:var(--y);color:#111;font-weight:700}
 .clock{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums;color:#ddd}
 main{flex:1;display:flex;min-height:0}
 #map{flex:1;height:100%;display:block}
-aside{width:360px;background:var(--p);border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+#map .tbl,#map .zn{cursor:pointer}
+aside{width:380px;background:var(--p);border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
 aside h2{font-size:18px;font-weight:700;padding:18px 20px 10px;color:var(--y);letter-spacing:.04em}
-#feed{flex:1;overflow:hidden;padding:0 14px}
-.it{background:#1e1e1e;border:1px solid var(--line);border-left:4px solid var(--go);border-radius:10px;padding:12px 14px;margin-bottom:10px;animation:slin .6s ease both}
+#feed,#detail{flex:1;overflow-y:auto;padding:0 14px 10px}
+.it{background:#1e1e1e;border:1px solid var(--line);border-left:4px solid var(--go);border-radius:10px;padding:12px 14px;margin-bottom:10px;animation:slin .6s ease both;cursor:pointer}
+.it:hover{border-color:var(--y)}
 @keyframes slin{from{opacity:0;transform:translateX(30px)}}
 .it b{display:block;font-size:17px}
 .it span{display:block;font-size:13px;color:var(--dim);margin-top:2px}
 .it em{display:inline-block;font-style:normal;font-size:13px;font-weight:700;color:var(--y);margin-top:6px}
 .it time{float:right;font-size:12px;color:var(--dim);margin-top:7px}
 .empty{color:var(--dim);font-size:14px;padding:6px 6px 0;line-height:1.5}
+.back{margin:4px 0 12px}
+.dh{font-size:26px;font-weight:800;line-height:1.1}
+.dsub{color:var(--dim);font-size:14px;margin:4px 0 12px}
+.dbar{height:6px;border-radius:3px;background:#2a2a2a;overflow:hidden;margin-bottom:14px}
+.dbar div{height:100%;background:var(--go)}
+.row{display:flex;align-items:center;gap:10px;padding:9px 6px;border-bottom:1px solid var(--line);font-size:14px}
+.row .dot{width:12px;height:12px;border-radius:50%;flex:none;border:1.5px solid}
+.row .sn{width:54px;color:var(--dim);font-size:12px;flex:none}
+.row .nm{flex:1;min-width:0}
+.row .nm b{display:block;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .nm span{display:block;font-size:12px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;flex:none}
+.tag.in{background:#16301e;color:#8fe0a6}.tag.exp{background:#3a3008;color:var(--y)}.tag.host{background:#2a2560;color:#cfcaff}
+.sec{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--y);margin:14px 6px 4px}
 #status{padding:10px 20px 14px;font-size:12px;color:var(--dim);border-top:1px solid var(--line)}
 #status.err{color:#f08a80}
 .legend{display:flex;gap:14px;padding:10px 20px;font-size:12px;color:#bbb;border-top:1px solid var(--line)}
@@ -61,6 +78,7 @@ aside h2{font-size:18px;font-weight:700;padding:18px 20px 10px;color:var(--y);le
 <header>
   <div class="brand"><i></i>CID · LIVE</div>
   <select id="lsel" title="Layout"></select>
+  <button id="tour">Auto tour</button>
   <div class="sp"></div>
   <div class="count">
     <div class="n"><b id="cArr">0</b><span>/ <span id="cTot">0</span> arrived · ирсэн</span></div>
@@ -78,8 +96,9 @@ aside h2{font-size:18px;font-weight:700;padding:18px 20px 10px;color:var(--y);le
     <g id="hall"></g><g id="items"></g>
   </svg>
   <aside>
-    <h2>Just arrived · Сая ирсэн</h2>
-    <div id="feed"><p class="empty">New arrivals appear here as guests check in.</p></div>
+    <h2 id="ptitle">Just arrived · Сая ирсэн</h2>
+    <div id="feed"><p class="empty">New arrivals appear here as guests check in. Click a table or zone to see who's there.</p></div>
+    <div id="detail" hidden></div>
     <div class="legend">
       <span style="--c:#4aa564;--b:#2f7a45">Arrived</span>
       <span style="--c:#3a3008;--b:#e0a526">Expected</span>
@@ -95,10 +114,11 @@ const TENANT_ID = "ae7e4397-7c08-41d5-b3a0-c86741c188cf";
 const FLOW_URL  = "https://f0e3c06ec378e576bef89b03e45d43.81.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/07/workflows/8065fdcf32d5444f88a7d777bcf95399/triggers/manual/paths/invoke?api-version=1";
 const SCOPE     = "https://service.flow.microsoft.com//.default";
 const REFRESH_SECONDS = 20;
+const TOUR_SECONDS = 8;
 /* ========================================================= */
 const $=id=>document.getElementById(id), NS="http://www.w3.org/2000/svg";
-const KINDS={stage:["#4a90d9",.28,"none"],display:["#e0a526",.2,"none"],area:["#4a90d9",.06,"4 3"],entrance:["#4aa564",.3,"none"]};
-let account=null, ATT=[], attById={}, EMP={}, LAYOUTS=[], S=null, known=null, fresh=new Set(), timer=null;
+const KINDS={stage:["#4a90d9",.28,"none","Stage"],display:["#e0a526",.2,"none","Display"],area:["#4a90d9",.06,"4 3","Area"],entrance:["#4aa564",.3,"none","Entrance"]};
+let account=null, ATT=[], attById={}, EMP={}, LAYOUTS=[], S=null, known=null, fresh=new Set(), sel=null, tourTimer=null, tourIdx=0;
 
 /* ---------- sign-in ---------- */
 const msalApp=new msal.PublicClientApplication({auth:{clientId:CLIENT_ID,authority:"https://login.microsoftonline.com/"+TENANT_ID,redirectUri:location.origin+location.pathname},cache:{cacheLocation:"sessionStorage"}});
@@ -107,7 +127,7 @@ async function initAuth(){
   if(!account){const a=msalApp.getAllAccounts();if(a.length)account=a[0]}
   if(!account)return;
   msalApp.setActiveAccount(account);$("gateMsg").textContent="Loading the live map…";
-  try{await refresh();$("gate").style.display="none";timer=setInterval(refresh,REFRESH_SECONDS*1000)}
+  try{await refresh();$("gate").style.display="none";setInterval(refresh,REFRESH_SECONDS*1000)}
   catch(e){$("gateMsg").textContent=e.noAccess?"You're signed in, but not on the allowed list. Ask the CRM admin to add you.":"Couldn't load: "+e.message+". Check that the Desk Management flow is on."}}
 $("signIn").onclick=()=>msalApp.loginRedirect({scopes:[SCOPE]});
 async function getToken(){
@@ -125,26 +145,19 @@ async function refresh(){
     ATT=(d.attendees||[]).map(a=>({id:a.id,name:a.name||"(no name)",company:a.company||"",arrived:!!a.arrived,desk:a.desk==null?null:+a.desk,seat:a.seat==null?null:+a.seat}));
     attById=Object.fromEntries(ATT.map(a=>[a.id,a]));
     EMP=Object.fromEntries((d.employees||[]).map(u=>[u.id,u.name]));
-    LAYOUTS=d.layouts||[];
-    fillLayouts();
+    LAYOUTS=d.layouts||[];fillLayouts();
     const want=new URLSearchParams(location.search).get("layout")||$("lsel").value||(LAYOUTS[0]&&LAYOUTS[0].id);
     const L=LAYOUTS.find(l=>l.id===want)||LAYOUTS[0];
     if(!L){$("status").textContent="No saved layout yet. Create one in the seat planner.";return}
-    $("lsel").value=L.id;
-    S=JSON.parse(L.data);applySeats();
-    const now=new Set(ATT.filter(a=>a.arrived).map(a=>a.id));
-    fresh=new Set();
-    if(known){[...now].filter(id=>!known.has(id)).forEach(id=>{fresh.add(id);addFeed(attById[id])})}
-    known=now;
-    render();counters();
+    $("lsel").value=L.id;S=JSON.parse(L.data);applySeats();
+    const now=new Set(ATT.filter(a=>a.arrived).map(a=>a.id));fresh=new Set();
+    if(known)[...now].filter(id=>!known.has(id)).forEach(id=>{fresh.add(id);addFeed(attById[id])});
+    known=now;render();counters();if(sel)showDetail();
     $("status").className="";$("status").textContent="Updated "+new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit"})+" · refreshes every "+REFRESH_SECONDS+" s";
-  }catch(e){
-    if(!S)throw e;
-    $("status").className="err";$("status").textContent=e.noAccess?"Access lost. Sign in again.":"Connection problem. Retrying in "+REFRESH_SECONDS+" s…";
-  }}
-function fillLayouts(){const sel=$("lsel"),cur=sel.value;
-  sel.innerHTML=LAYOUTS.map(l=>`<option value="${esc(l.id)}">${esc(l.name||"(unnamed)")}</option>`).join("");if(cur)sel.value=cur}
-$("lsel").onchange=e=>{const u=new URL(location);u.searchParams.set("layout",e.target.value);history.replaceState(null,"",u);known=null;$("feed").innerHTML='<p class="empty">New arrivals appear here as guests check in.</p>';refresh()};
+  }catch(e){if(!S)throw e;$("status").className="err";$("status").textContent=e.noAccess?"Access lost. Sign in again.":"Connection problem. Retrying in "+REFRESH_SECONDS+" s…"}}
+function fillLayouts(){const s=$("lsel"),cur=s.value;s.innerHTML=LAYOUTS.map(l=>`<option value="${esc(l.id)}">${esc(l.name||"(unnamed)")}</option>`).join("");if(cur)s.value=cur}
+$("lsel").onchange=e=>{const u=new URL(location);u.searchParams.set("layout",e.target.value);history.replaceState(null,"",u);known=null;closeDetail();
+  $("feed").innerHTML='<p class="empty">New arrivals appear here as guests check in.</p>';refresh()};
 function tables(){return S.items.filter(i=>i.k==="t")}
 function zones(){return S.items.filter(i=>i.k==="z")}
 function applySeats(){
@@ -157,7 +170,42 @@ function counters(){const tot=ATT.length,arr=ATT.filter(a=>a.arrived).length,b=$
 function addFeed(a){if(!a)return;const f=$("feed"),e=f.querySelector(".empty");if(e)e.remove();
   const s=seatOf(a.id),d=document.createElement("div");d.className="it";
   d.innerHTML=`<time>${new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</time><b>${esc(a.name)}</b><span>${esc(a.company)}</span><em>${s?`Ширээ ${s[0]} · Суудал ${s[1]} / Table ${s[0]} · Seat ${s[1]}`:"No seat assigned"}</em>`;
-  f.prepend(d);while(f.children.length>10)f.lastChild.remove()}
+  if(s)d.onclick=()=>{stopTour();select({k:"t",num:s[0]})};
+  f.prepend(d);while(f.children.length>12)f.lastChild.remove()}
+
+/* ---------- details panel ---------- */
+function select(s){sel=s;render();showDetail()}
+function closeDetail(){sel=null;$("detail").hidden=true;$("feed").hidden=false;$("ptitle").textContent="Just arrived · Сая ирсэн";if(S)render()}
+function showDetail(){
+  const D=$("detail");$("feed").hidden=true;D.hidden=false;let h=`<button class="back" id="bk">← Back to arrivals</button>`;
+  if(sel.k==="t"){
+    const t=tables().find(x=>x.num===sel.num);if(!t){closeDetail();return}
+    $("ptitle").textContent=`Table ${t.num} · Ширээ ${t.num}`;
+    const guests=t.seats.slice(1).filter(Boolean),arr=guests.filter(s=>attById[s.a]&&attById[s.a].arrived).length;
+    h+=`<div class="dh">Table ${t.num}</div><div class="dsub">${arr} / ${guests.length} arrived · ${t.chairs} chairs · ${esc(t.shape)}</div>
+        <div class="dbar"><div style="width:${guests.length?arr/guests.length*100:0}%"></div></div><div class="sec">Host · Хөтлөгч</div>`;
+    const ho=t.seats[0];
+    h+=ho?`<div class="row"><span class="dot" style="background:#8f86e8;border-color:#5d54c4"></span><span class="sn">Seat 1</span><div class="nm"><b>${esc(EMP[ho.u]||"(employee)")}</b><span>Barloworld Mongolia</span></div><span class="tag host">${esc(ho.role||"Host")}</span></div>`
+         :`<div class="row"><span class="dot" style="border-color:#5d54c4"></span><span class="sn">Seat 1</span><div class="nm"><span>No host assigned</span></div></div>`;
+    h+=`<div class="sec">Guests · Зочид</div>`;
+    t.seats.forEach((s,i)=>{if(i===0)return;const a=s&&attById[s.a];
+      h+=a?`<div class="row"><span class="dot" style="background:${a.arrived?"#4aa564":"#3a3008"};border-color:${a.arrived?"#2f7a45":"#e0a526"}"></span><span class="sn">Seat ${i+1}</span><div class="nm"><b>${esc(a.name)}</b><span>${esc(a.company)}</span></div><span class="tag ${a.arrived?"in":"exp"}">${a.arrived?"Arrived":"Expected"}</span></div>`
+          :`<div class="row"><span class="dot" style="border-color:#333"></span><span class="sn">Seat ${i+1}</span><div class="nm"><span>Empty</span></div></div>`});
+  }else{
+    const z=zones().find(x=>x.id===sel.id);if(!z){closeDetail();return}
+    $("ptitle").textContent=z.label;const staff=(z.staff||[]);
+    h+=`<div class="dh">${esc(z.label)}</div><div class="dsub">${esc((KINDS[z.kind]||KINDS.area)[3])} · ${staff.length} staff</div><div class="sec">Stationed here · Байршсан ажилтнууд</div>`;
+    h+=staff.length?staff.map(id=>{const host=tables().find(t=>t.seats[0]&&t.seats[0].u===id);
+        return`<div class="row"><span class="dot" style="background:#8f86e8;border-color:#5d54c4"></span><div class="nm"><b>${esc(EMP[id]||"(employee)")}</b><span>${host?"Also hosts table "+host.num:"Barloworld Mongolia"}</span></div></div>`}).join("")
+      :`<p class="empty">No one is stationed here. Assign staff in the seat planner.</p>`;
+  }
+  D.innerHTML=h;$("bk").onclick=()=>{stopTour();closeDetail()}}
+
+/* ---------- auto tour ---------- */
+function stopTour(){if(tourTimer){clearInterval(tourTimer);tourTimer=null;$("tour").classList.remove("on")}}
+$("tour").onclick=()=>{if(tourTimer){stopTour();return}
+  $("tour").classList.add("on");const step=()=>{const list=tables().filter(t=>t.seats.some(Boolean)).sort((a,b)=>a.num-b.num);if(!list.length)return;
+    tourIdx=tourIdx%list.length;select({k:"t",num:list[tourIdx].num});tourIdx++};step();tourTimer=setInterval(step,TOUR_SECONDS*1000)};
 
 /* ---------- geometry (same as the planner) ---------- */
 function dims(t){const n=t.chairs;
@@ -175,29 +223,36 @@ function zbox(z){if(z.shape==="poly"){const xs=z.pts.map(p=>p[0]),ys=z.pts.map(p
 
 /* ---------- drawing ---------- */
 function el(n,a,p){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
-function tx(p,x,y,s,fs,fill,extra){const t=el("text",Object.assign({x,y,"font-size":fs,fill:fill||"#fff","text-anchor":"middle","font-family":"Barlow,Segoe UI,sans-serif","font-weight":"700"},extra||{}),p);t.textContent=s;return t}
+function tx(p,x,y,s,fs,fill,extra){const t=el("text",Object.assign({x,y,"font-size":fs,fill:fill||"#fff","text-anchor":"middle","pointer-events":"none","font-family":"Barlow,Segoe UI,sans-serif","font-weight":"700"},extra||{}),p);t.textContent=s;return t}
 function render(){
   const H=$("hall"),I=$("items");H.innerHTML="";I.innerHTML="";
   const b=hb(),pad=Math.max(b.x1-b.x0,b.y1-b.y0)*.05;
   $("map").setAttribute("viewBox",`${b.x0-pad} ${b.y0-pad} ${b.x1-b.x0+pad*2} ${b.y1-b.y0+pad*2}`);
   const h=S.hall,a={fill:"url(#m5)",stroke:"#FFCD11","stroke-width":2,"stroke-opacity":.6,"vector-effect":"non-scaling-stroke"};
-  if(h.type==="ellipse")el("ellipse",Object.assign({cx:h.W/2,cy:h.L/2,rx:h.W/2,ry:h.L/2},a),H);
-  else el("polygon",Object.assign({points:h.pts.map(p=>p.join(",")).join(" ")},a),H);
-  zones().forEach(z=>{const c=KINDS[z.kind]||KINDS.area;let tf=`translate(${z.x},${z.y})`;if(z.shape!=="poly"&&z.rot)tf+=` rotate(${z.rot} ${z.w/2} ${z.h/2})`;
-    const g=el("g",{transform:tf},I),s={fill:c[0],"fill-opacity":c[1],stroke:c[0],"stroke-width":1.2,"stroke-dasharray":c[2],"vector-effect":"non-scaling-stroke"};
+  const bg=h.type==="ellipse"?el("ellipse",Object.assign({cx:h.W/2,cy:h.L/2,rx:h.W/2,ry:h.L/2},a),H):el("polygon",Object.assign({points:h.pts.map(p=>p.join(",")).join(" ")},a),H);
+  bg.addEventListener("click",()=>{if(sel){stopTour();closeDetail()}});
+  zones().forEach(z=>{const c=KINDS[z.kind]||KINDS.area,on=sel&&sel.k==="z"&&sel.id===z.id;
+    let tf=`translate(${z.x},${z.y})`;if(z.shape!=="poly"&&z.rot)tf+=` rotate(${z.rot} ${z.w/2} ${z.h/2})`;
+    const g=el("g",{class:"zn",transform:tf},I),s={fill:c[0],"fill-opacity":c[1],stroke:on?"#ffffff":c[0],"stroke-width":on?3:1.2,"stroke-dasharray":on?"none":c[2],"vector-effect":"non-scaling-stroke"};
     let cx=z.w/2,cy=z.h/2,bh=z.h,bw=z.w;
     if(z.shape==="ellipse")el("ellipse",Object.assign({cx,cy,rx:z.w/2,ry:z.h/2},s),g);
     else if(z.shape==="poly"){el("polygon",Object.assign({points:z.pts.map(p=>p.join(",")).join(" ")},s),g);cx=z.pts.reduce((q,p)=>q+p[0],0)/z.pts.length;cy=z.pts.reduce((q,p)=>q+p[1],0)/z.pts.length;const zb=zbox(z);bw=zb.w;bh=zb.h}
     else el("rect",Object.assign({width:z.w,height:z.h,rx:.3},s),g);
-    const fs=Math.max(.3,Math.min(1,bh*.32,bw/Math.max(4,z.label.length)*1.7));tx(g,cx,cy+fs*.35,z.label,fs)});
-  tables().forEach(t=>{const g=el("g",{transform:`translate(${t.x},${t.y}) rotate(${t.rot||0})`},I),d=dims(t);
-    t.seats.forEach((s,i)=>{const[x,y]=chairPos(t,i);let f="none",st="#333",cls="ch";
-      if(i===0&&s){f="#8f86e8";st="#5d54c4"}
-      else if(s){const at=attById[s.a];if(at&&at.arrived){f="#4aa564";st="#2f7a45";if(fresh.has(at.id))cls+=" new"}else{f="#3a3008";st="#e0a526"}}
-      el("circle",{class:cls,cx:x,cy:y,r:.3,fill:f,stroke:st,"stroke-width":1.4,"vector-effect":"non-scaling-stroke"},g)});
-    const ta={fill:"#FFCD11","fill-opacity":.12,stroke:"#FFCD11","stroke-opacity":.7,"stroke-width":1.2,"vector-effect":"non-scaling-stroke"};
+    const fs=Math.max(.3,Math.min(1,bh*.32,bw/Math.max(4,z.label.length)*1.7)),n=(z.staff||[]).length;
+    tx(g,cx,cy+(n?0:fs*.35),z.label,fs);if(n)tx(g,cx,cy+fs*1.1,n+" staff",fs*.65,"#cfcaff");
+    g.addEventListener("click",e=>{e.stopPropagation();stopTour();select({k:"z",id:z.id})})});
+  tables().forEach(t=>{const on=sel&&sel.k==="t"&&sel.num===t.num,d=dims(t);
+    const g=el("g",{class:"tbl",transform:`translate(${t.x},${t.y}) rotate(${t.rot||0})`},I);
+    t.seats.forEach((s,i)=>{const[x,y]=chairPos(t,i);let f="none",st="#333",cls="ch",who="Empty seat";
+      if(i===0&&s){f="#8f86e8";st="#5d54c4";who="Host: "+(EMP[s.u]||"employee")}
+      else if(s){const at=attById[s.a];if(at){who=at.name+(at.company?" · "+at.company:"");
+        if(at.arrived){f="#4aa564";st="#2f7a45";if(fresh.has(at.id))cls+=" new"}else{f="#3a3008";st="#e0a526"}}}
+      const c=el("circle",{class:cls,cx:x,cy:y,r:.3,fill:f,stroke:st,"stroke-width":1.4,"vector-effect":"non-scaling-stroke"},g);
+      el("title",{},c).textContent=`Table ${t.num} · Seat ${i+1} — ${who}`});
+    const ta={fill:"#FFCD11","fill-opacity":on?.35:.12,stroke:on?"#ffffff":"#FFCD11","stroke-opacity":on?1:.7,"stroke-width":on?3:1.2,"vector-effect":"non-scaling-stroke"};
     if(d.e)el("ellipse",Object.assign({rx:d.tx,ry:d.ty},ta),g);else el("rect",Object.assign({x:-d.tx,y:-d.ty,width:2*d.tx,height:2*d.ty,rx:.15},ta),g);
-    tx(g,0,.28,String(t.num),Math.min(.8,d.ty*1.2+.2),"#FFCD11",{transform:`rotate(${-(t.rot||0)})`})})}
+    tx(g,0,.28,String(t.num),Math.min(.8,d.ty*1.2+.2),on?"#ffffff":"#FFCD11",{transform:`rotate(${-(t.rot||0)})`});
+    g.addEventListener("click",e=>{e.stopPropagation();stopTour();select({k:"t",num:t.num})})})}
 
 /* ---------- clock, full screen, utils ---------- */
 setInterval(()=>{$("clock").textContent=new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})},1000);
