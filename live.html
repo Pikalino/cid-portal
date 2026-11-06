@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CID Live arrivals</title>
+<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.3/lib/msal-browser.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--y:#FFCD11;--k:#0b0b0b;--p:#161616;--line:#2a2a2a;--dim:#8a8a8a;--go:#4aa564}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--k);color:#fff;font-family:"Barlow","Segoe UI",system-ui,sans-serif;overflow:hidden}
+body{display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:22px;padding:14px 24px;background:var(--p);border-bottom:3px solid var(--y)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:.06em}
+.brand i{width:12px;height:12px;border-radius:50%;background:#e24b4a;box-shadow:0 0 0 0 rgba(226,75,74,.7);animation:ping 1.6s infinite}
+@keyframes ping{70%{box-shadow:0 0 0 12px rgba(226,75,74,0)}100%{box-shadow:0 0 0 0 rgba(226,75,74,0)}}
+select,button{background:#222;color:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 12px;font:inherit;font-size:14px;cursor:pointer}
+button.pri{background:var(--y);border-color:var(--y);color:#111;font-weight:700}
+.sp{flex:1}
+.count{min-width:300px}
+.count .n{display:flex;align-items:baseline;gap:10px}
+.count b{font-size:46px;line-height:1;font-weight:800;color:var(--y);transition:transform .3s}
+.count b.bump{transform:scale(1.15)}
+.count span{font-size:18px;color:#ccc}
+.bar{height:8px;border-radius:4px;background:#2a2a2a;margin-top:8px;overflow:hidden}
+.bar div{height:100%;width:0;background:var(--y);transition:width .8s ease}
+.clock{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums;color:#ddd}
+main{flex:1;display:flex;min-height:0}
+#map{flex:1;height:100%;display:block}
+aside{width:360px;background:var(--p);border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+aside h2{font-size:18px;font-weight:700;padding:18px 20px 10px;color:var(--y);letter-spacing:.04em}
+#feed{flex:1;overflow:hidden;padding:0 14px}
+.it{background:#1e1e1e;border:1px solid var(--line);border-left:4px solid var(--go);border-radius:10px;padding:12px 14px;margin-bottom:10px;animation:slin .6s ease both}
+@keyframes slin{from{opacity:0;transform:translateX(30px)}}
+.it b{display:block;font-size:17px}
+.it span{display:block;font-size:13px;color:var(--dim);margin-top:2px}
+.it em{display:inline-block;font-style:normal;font-size:13px;font-weight:700;color:var(--y);margin-top:6px}
+.it time{float:right;font-size:12px;color:var(--dim);margin-top:7px}
+.empty{color:var(--dim);font-size:14px;padding:6px 6px 0;line-height:1.5}
+#status{padding:10px 20px 14px;font-size:12px;color:var(--dim);border-top:1px solid var(--line)}
+#status.err{color:#f08a80}
+.legend{display:flex;gap:14px;padding:10px 20px;font-size:12px;color:#bbb;border-top:1px solid var(--line)}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px;background:var(--c);border:1.5px solid var(--b)}
+.ch.new{animation:pulse 1.2s ease-in-out 4;transform-box:fill-box;transform-origin:center}
+@keyframes pulse{50%{transform:scale(1.9)}}
+#gate{position:fixed;inset:0;z-index:20;background:var(--k);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px}
+#gate h2{font-size:26px}#gate p{color:var(--dim);max-width:380px;line-height:1.5}
+#gateMsg{color:var(--y);max-width:400px;font-size:14px;line-height:1.5}
+</style>
+</head>
+<body>
+<div id="gate">
+  <h2>CID · Live arrivals</h2>
+  <p>Sign in with your Barloworld Microsoft account to show the live seat map.</p>
+  <button class="pri" id="signIn">Sign in with Microsoft</button>
+  <div id="gateMsg"></div>
+</div>
+<header>
+  <div class="brand"><i></i>CID · LIVE</div>
+  <select id="lsel" title="Layout"></select>
+  <div class="sp"></div>
+  <div class="count">
+    <div class="n"><b id="cArr">0</b><span>/ <span id="cTot">0</span> arrived · ирсэн</span></div>
+    <div class="bar"><div id="cBar"></div></div>
+  </div>
+  <div class="clock" id="clock">--:--</div>
+  <button id="fs">Full screen</button>
+</header>
+<main>
+  <svg id="map" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <pattern id="m1" width="1" height="1" patternUnits="userSpaceOnUse"><path d="M1 0H0V1" fill="none" stroke="#FFCD11" stroke-opacity=".06" stroke-width=".03"/></pattern>
+      <pattern id="m5" width="5" height="5" patternUnits="userSpaceOnUse"><rect width="5" height="5" fill="url(#m1)"/><path d="M5 0H0V5" fill="none" stroke="#FFCD11" stroke-opacity=".14" stroke-width=".06"/></pattern>
+    </defs>
+    <g id="hall"></g><g id="items"></g>
+  </svg>
+  <aside>
+    <h2>Just arrived · Сая ирсэн</h2>
+    <div id="feed"><p class="empty">New arrivals appear here as guests check in.</p></div>
+    <div class="legend">
+      <span style="--c:#4aa564;--b:#2f7a45">Arrived</span>
+      <span style="--c:#3a3008;--b:#e0a526">Expected</span>
+      <span style="--c:#8f86e8;--b:#5d54c4">Host</span>
+    </div>
+    <div id="status">Connecting…</div>
+  </aside>
+</main>
+<script>
+/* ===================== YOUR SETTINGS ===================== */
+const CLIENT_ID = "5dfaa00c-35a4-468d-b9aa-c4d908fd0c8c";
+const TENANT_ID = "ae7e4397-7c08-41d5-b3a0-c86741c188cf";
+const FLOW_URL  = "https://f0e3c06ec378e576bef89b03e45d43.81.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/07/workflows/8065fdcf32d5444f88a7d777bcf95399/triggers/manual/paths/invoke?api-version=1";
+const SCOPE     = "https://service.flow.microsoft.com//.default";
+const REFRESH_SECONDS = 20;
+/* ========================================================= */
+const $=id=>document.getElementById(id), NS="http://www.w3.org/2000/svg";
+const KINDS={stage:["#4a90d9",.28,"none"],display:["#e0a526",.2,"none"],area:["#4a90d9",.06,"4 3"],entrance:["#4aa564",.3,"none"]};
+let account=null, ATT=[], attById={}, EMP={}, LAYOUTS=[], S=null, known=null, fresh=new Set(), timer=null;
+
+/* ---------- sign-in ---------- */
+const msalApp=new msal.PublicClientApplication({auth:{clientId:CLIENT_ID,authority:"https://login.microsoftonline.com/"+TENANT_ID,redirectUri:location.origin+location.pathname},cache:{cacheLocation:"sessionStorage"}});
+async function initAuth(){
+  try{const r=await msalApp.handleRedirectPromise();if(r&&r.account)account=r.account}catch(e){$("gateMsg").textContent="Sign-in failed: "+(e.errorMessage||e.message)}
+  if(!account){const a=msalApp.getAllAccounts();if(a.length)account=a[0]}
+  if(!account)return;
+  msalApp.setActiveAccount(account);$("gateMsg").textContent="Loading the live map…";
+  try{await refresh();$("gate").style.display="none";timer=setInterval(refresh,REFRESH_SECONDS*1000)}
+  catch(e){$("gateMsg").textContent=e.noAccess?"You're signed in, but not on the allowed list. Ask the CRM admin to add you.":"Couldn't load: "+e.message+". Check that the Desk Management flow is on."}}
+$("signIn").onclick=()=>msalApp.loginRedirect({scopes:[SCOPE]});
+async function getToken(){
+  try{return(await msalApp.acquireTokenSilent({scopes:[SCOPE],account})).accessToken}
+  catch(e){if(e instanceof msal.InteractionRequiredAuthError)await msalApp.acquireTokenRedirect({scopes:[SCOPE],account});throw e}}
+async function callFlow(body){
+  const res=await fetch(FLOW_URL,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+await getToken()},body:JSON.stringify(body)});
+  if(res.status===401||res.status===403){const e=new Error("No access");e.noAccess=true;throw e}
+  const j=await res.json().catch(()=>({}));if(!res.ok)throw new Error(j.message||("Error "+res.status));return j}
+
+/* ---------- data ---------- */
+async function refresh(){
+  try{
+    const d=await callFlow({action:"load"});
+    ATT=(d.attendees||[]).map(a=>({id:a.id,name:a.name||"(no name)",company:a.company||"",arrived:!!a.arrived,desk:a.desk==null?null:+a.desk,seat:a.seat==null?null:+a.seat}));
+    attById=Object.fromEntries(ATT.map(a=>[a.id,a]));
+    EMP=Object.fromEntries((d.employees||[]).map(u=>[u.id,u.name]));
+    LAYOUTS=d.layouts||[];
+    fillLayouts();
+    const want=new URLSearchParams(location.search).get("layout")||$("lsel").value||(LAYOUTS[0]&&LAYOUTS[0].id);
+    const L=LAYOUTS.find(l=>l.id===want)||LAYOUTS[0];
+    if(!L){$("status").textContent="No saved layout yet. Create one in the seat planner.";return}
+    $("lsel").value=L.id;
+    S=JSON.parse(L.data);applySeats();
+    const now=new Set(ATT.filter(a=>a.arrived).map(a=>a.id));
+    fresh=new Set();
+    if(known){[...now].filter(id=>!known.has(id)).forEach(id=>{fresh.add(id);addFeed(attById[id])})}
+    known=now;
+    render();counters();
+    $("status").className="";$("status").textContent="Updated "+new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit"})+" · refreshes every "+REFRESH_SECONDS+" s";
+  }catch(e){
+    if(!S)throw e;
+    $("status").className="err";$("status").textContent=e.noAccess?"Access lost. Sign in again.":"Connection problem. Retrying in "+REFRESH_SECONDS+" s…";
+  }}
+function fillLayouts(){const sel=$("lsel"),cur=sel.value;
+  sel.innerHTML=LAYOUTS.map(l=>`<option value="${esc(l.id)}">${esc(l.name||"(unnamed)")}</option>`).join("");if(cur)sel.value=cur}
+$("lsel").onchange=e=>{const u=new URL(location);u.searchParams.set("layout",e.target.value);history.replaceState(null,"",u);known=null;$("feed").innerHTML='<p class="empty">New arrivals appear here as guests check in.</p>';refresh()};
+function tables(){return S.items.filter(i=>i.k==="t")}
+function zones(){return S.items.filter(i=>i.k==="z")}
+function applySeats(){
+  tables().forEach(t=>t.seats=t.seats.map((s,i)=>i===0?s:null));
+  ATT.forEach(a=>{if(!a.desk||!a.seat)return;const t=tables().find(t=>t.num===a.desk);if(t&&a.seat>=2&&a.seat<=t.chairs&&!t.seats[a.seat-1])t.seats[a.seat-1]={a:a.id}})}
+function seatOf(id){for(const t of tables())for(let i=1;i<t.seats.length;i++)if(t.seats[i]&&t.seats[i].a===id)return[t.num,i+1];return null}
+function counters(){const tot=ATT.length,arr=ATT.filter(a=>a.arrived).length,b=$("cArr");
+  if(+b.textContent!==arr){b.classList.add("bump");setTimeout(()=>b.classList.remove("bump"),300)}
+  b.textContent=arr;$("cTot").textContent=tot;$("cBar").style.width=(tot?arr/tot*100:0)+"%"}
+function addFeed(a){if(!a)return;const f=$("feed"),e=f.querySelector(".empty");if(e)e.remove();
+  const s=seatOf(a.id),d=document.createElement("div");d.className="it";
+  d.innerHTML=`<time>${new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</time><b>${esc(a.name)}</b><span>${esc(a.company)}</span><em>${s?`Ширээ ${s[0]} · Суудал ${s[1]} / Table ${s[0]} · Seat ${s[1]}`:"No seat assigned"}</em>`;
+  f.prepend(d);while(f.children.length>10)f.lastChild.remove()}
+
+/* ---------- geometry (same as the planner) ---------- */
+function dims(t){const n=t.chairs;
+  if(t.shape==="round"){const R=Math.max(1.3,n*.7/(2*Math.PI));return{e:1,rx:R,ry:R,tx:R-.45,ty:R-.45}}
+  if(t.shape==="oval"){const b=Math.max(1,n*.7/8.975),a=b*1.8;return{e:1,rx:a,ry:b,tx:a-.45,ty:b-.45}}
+  if(t.shape==="square"){const R=Math.max(1.3,n*.7/8);return{e:0,rx:R,ry:R,tx:R-.45,ty:R-.45}}
+  const len=Math.max(1.8,Math.ceil(n/2)*.7);return{e:0,long:1,rx:len/2+.45,ry:.9,tx:len/2,ty:.45}}
+function chairPos(t,i){const d=dims(t),n=t.chairs;
+  if(d.e){const a=-Math.PI/2+i*2*Math.PI/n;return[Math.cos(a)*d.rx,Math.sin(a)*d.ry]}
+  if(d.long){const top=Math.ceil(n/2),bot=n-top;if(i<top){const sp=2*d.tx/top;return[-d.tx+sp*(i+.5),-d.ry]}const k=i-top,sp=2*d.tx/Math.max(1,bot);return[d.tx-sp*(k+.5),d.ry]}
+  const w=2*d.rx,h=2*d.ry,s=2*(w+h)/n;let p=s*(i+.5);
+  if(p<w)return[-d.rx+p,-d.ry];p-=w;if(p<h)return[d.rx,-d.ry+p];p-=h;if(p<w)return[d.rx-p,d.ry];p-=w;return[-d.rx,d.ry-p]}
+function hb(){const h=S.hall;if(h.type==="ellipse")return{x0:0,y0:0,x1:h.W,y1:h.L};const xs=h.pts.map(p=>p[0]),ys=h.pts.map(p=>p[1]);return{x0:Math.min(...xs),y0:Math.min(...ys),x1:Math.max(...xs),y1:Math.max(...ys)}}
+function zbox(z){if(z.shape==="poly"){const xs=z.pts.map(p=>p[0]),ys=z.pts.map(p=>p[1]);return{x:z.x+Math.min(...xs),y:z.y+Math.min(...ys),w:Math.max(...xs)-Math.min(...xs),h:Math.max(...ys)-Math.min(...ys)}}return{x:z.x,y:z.y,w:z.w,h:z.h}}
+
+/* ---------- drawing ---------- */
+function el(n,a,p){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
+function tx(p,x,y,s,fs,fill,extra){const t=el("text",Object.assign({x,y,"font-size":fs,fill:fill||"#fff","text-anchor":"middle","font-family":"Barlow,Segoe UI,sans-serif","font-weight":"700"},extra||{}),p);t.textContent=s;return t}
+function render(){
+  const H=$("hall"),I=$("items");H.innerHTML="";I.innerHTML="";
+  const b=hb(),pad=Math.max(b.x1-b.x0,b.y1-b.y0)*.05;
+  $("map").setAttribute("viewBox",`${b.x0-pad} ${b.y0-pad} ${b.x1-b.x0+pad*2} ${b.y1-b.y0+pad*2}`);
+  const h=S.hall,a={fill:"url(#m5)",stroke:"#FFCD11","stroke-width":2,"stroke-opacity":.6,"vector-effect":"non-scaling-stroke"};
+  if(h.type==="ellipse")el("ellipse",Object.assign({cx:h.W/2,cy:h.L/2,rx:h.W/2,ry:h.L/2},a),H);
+  else el("polygon",Object.assign({points:h.pts.map(p=>p.join(",")).join(" ")},a),H);
+  zones().forEach(z=>{const c=KINDS[z.kind]||KINDS.area;let tf=`translate(${z.x},${z.y})`;if(z.shape!=="poly"&&z.rot)tf+=` rotate(${z.rot} ${z.w/2} ${z.h/2})`;
+    const g=el("g",{transform:tf},I),s={fill:c[0],"fill-opacity":c[1],stroke:c[0],"stroke-width":1.2,"stroke-dasharray":c[2],"vector-effect":"non-scaling-stroke"};
+    let cx=z.w/2,cy=z.h/2,bh=z.h,bw=z.w;
+    if(z.shape==="ellipse")el("ellipse",Object.assign({cx,cy,rx:z.w/2,ry:z.h/2},s),g);
+    else if(z.shape==="poly"){el("polygon",Object.assign({points:z.pts.map(p=>p.join(",")).join(" ")},s),g);cx=z.pts.reduce((q,p)=>q+p[0],0)/z.pts.length;cy=z.pts.reduce((q,p)=>q+p[1],0)/z.pts.length;const zb=zbox(z);bw=zb.w;bh=zb.h}
+    else el("rect",Object.assign({width:z.w,height:z.h,rx:.3},s),g);
+    const fs=Math.max(.3,Math.min(1,bh*.32,bw/Math.max(4,z.label.length)*1.7));tx(g,cx,cy+fs*.35,z.label,fs)});
+  tables().forEach(t=>{const g=el("g",{transform:`translate(${t.x},${t.y}) rotate(${t.rot||0})`},I),d=dims(t);
+    t.seats.forEach((s,i)=>{const[x,y]=chairPos(t,i);let f="none",st="#333",cls="ch";
+      if(i===0&&s){f="#8f86e8";st="#5d54c4"}
+      else if(s){const at=attById[s.a];if(at&&at.arrived){f="#4aa564";st="#2f7a45";if(fresh.has(at.id))cls+=" new"}else{f="#3a3008";st="#e0a526"}}
+      el("circle",{class:cls,cx:x,cy:y,r:.3,fill:f,stroke:st,"stroke-width":1.4,"vector-effect":"non-scaling-stroke"},g)});
+    const ta={fill:"#FFCD11","fill-opacity":.12,stroke:"#FFCD11","stroke-opacity":.7,"stroke-width":1.2,"vector-effect":"non-scaling-stroke"};
+    if(d.e)el("ellipse",Object.assign({rx:d.tx,ry:d.ty},ta),g);else el("rect",Object.assign({x:-d.tx,y:-d.ty,width:2*d.tx,height:2*d.ty,rx:.15},ta),g);
+    tx(g,0,.28,String(t.num),Math.min(.8,d.ty*1.2+.2),"#FFCD11",{transform:`rotate(${-(t.rot||0)})`})})}
+
+/* ---------- clock, full screen, utils ---------- */
+setInterval(()=>{$("clock").textContent=new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})},1000);
+$("fs").onclick=()=>{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()};
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+initAuth();
+</script>
+</body>
+</html>
