@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CID Seat Planner</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.3/lib/msal-browser.min.js"></script>
 <style>
 :root{--bg:#0b1e35;--panel:#10263f;--line:#24405f;--ink:#e8eef5;--dim:#8aa0b8;--blue:#4a90d9;--amber:#e0a526;--green:#4aa564;--purple:#8f86e8}
@@ -52,6 +54,12 @@ h2{font-size:15px;margin:0 0 10px;font-weight:600}
 #gate p{color:var(--dim);max-width:380px;line-height:1.5;margin:0}
 #gateMsg{color:var(--amber);max-width:380px;line-height:1.5;font-size:13px}
 @media (max-width:820px){.wrap{flex-direction:column}aside{width:100%;height:45%;border-left:none;border-top:1px solid var(--line)}}
+#v3d{position:fixed;left:0;right:0;bottom:0;z-index:15;background:#0b0b0b;display:none}
+#v3d canvas{display:block}
+#v3dbar{position:absolute;top:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap;z-index:2}
+#v3dbar button{background:rgba(17,17,17,.85)}
+#v3dtip{position:absolute;display:none;pointer-events:none;background:#111;border:1px solid #FFCD11;border-radius:8px;padding:8px 10px;font-size:12px;line-height:1.5;z-index:3;max-width:240px}
+#v3dhelp{position:absolute;bottom:12px;left:12px;font-size:12px;color:#8aa0b8;z-index:2}
 </style>
 </head>
 <body>
@@ -87,6 +95,7 @@ h2{font-size:15px;margin:0 0 10px;font-weight:600}
     <button id="bZo" title="Zoom out">−</button>
     <button id="bZi" title="Zoom in">+</button>
     <button id="bFit">Fit</button>
+    <button id="b3d">3D view</button>
     <button id="bExp">Export</button>
     <button id="bImp">Import</button>
     <input id="fImp" type="file" accept=".json" hidden>
@@ -104,6 +113,17 @@ h2{font-size:15px;margin:0 0 10px;font-weight:600}
     <div class="stats" id="stats"></div>
     <div id="panel"></div>
   </aside>
+</div>
+<div id="v3d">
+  <div id="v3dbar">
+    <button data-cam="top">Top</button>
+    <button data-cam="iso">Isometric</button>
+    <button data-cam="stage">From stage</button>
+    <button data-cam="entrance">From entrance</button>
+    <button id="v3dclose" class="pri">Back to 2D</button>
+  </div>
+  <div id="v3dtip"></div>
+  <div id="v3dhelp">Drag to rotate · Right-drag to pan · Scroll to zoom · Click a chair for details</div>
 </div>
 <script>
 /* ===================== YOUR SETTINGS ===================== */
@@ -449,6 +469,114 @@ $("fImp").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileRe
   r.onload=()=>{try{const o=JSON.parse(r.result);if(!o.hall||!Array.isArray(o.items))throw 0;S=o;layoutId="";$("lsel").value="__new";applySeats();sel=null;vtx=-1;fit();refresh();flash("Layout imported as a new layout. Name it and Save.")}catch(x){flash("That file isn't a valid layout")}};r.readAsText(f);e.target.value=""};
 window.addEventListener("resize",fit);
 window.addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
+/* ---------- 3D view ---------- */
+let R3=null;
+function label3(text,color,size){
+  const c=document.createElement("canvas");c.width=512;c.height=128;const x=c.getContext("2d");
+  let fs=64;x.font=`bold ${fs}px Segoe UI, sans-serif`;
+  while(x.measureText(text).width>490&&fs>20){fs-=4;x.font=`bold ${fs}px Segoe UI, sans-serif`}
+  x.textAlign="center";x.textBaseline="middle";x.fillStyle="#"+color.toString(16).padStart(6,"0");x.fillText(text,256,64);
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false,transparent:true}));
+  sp.scale.set(size*4,size,1);return sp}
+function open3D(){
+  if(typeof THREE==="undefined"||!THREE.OrbitControls){flash("The 3D engine didn't load. Check your connection and reload.");return}
+  const box=$("v3d");box.style.top=document.querySelector("header").offsetHeight+"px";box.style.display="block";
+  const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(box.clientWidth,box.clientHeight);renderer.shadowMap.enabled=true;box.appendChild(renderer.domElement);
+  const scene=new THREE.Scene();scene.background=new THREE.Color(0x0b0b0b);
+  const b=hb(),cx=(b.x0+b.x1)/2,cz=(b.y0+b.y1)/2,span=Math.max(b.x1-b.x0,b.y1-b.y0);
+  scene.fog=new THREE.Fog(0x0b0b0b,span*1.6,span*4);
+  const cam=new THREE.PerspectiveCamera(50,box.clientWidth/box.clientHeight,0.1,span*10);
+  scene.add(new THREE.HemisphereLight(0xffffff,0x222222,0.75));
+  const sun=new THREE.DirectionalLight(0xffffff,0.8);sun.position.set(cx+span*.4,span,cz+span*.3);sun.target.position.set(cx,0,cz);
+  sun.castShadow=true;Object.assign(sun.shadow.camera,{left:-span,right:span,top:span,bottom:-span,far:span*3});sun.shadow.mapSize.set(2048,2048);
+  scene.add(sun,sun.target);
+  const outline=S.hall.type==="ellipse"
+    ?Array.from({length:72},(_,k)=>{const a=k/72*Math.PI*2;return[S.hall.W/2+Math.cos(a)*S.hall.W/2,S.hall.L/2+Math.sin(a)*S.hall.L/2]})
+    :S.hall.pts;
+  const shapeOf=pts=>{const s=new THREE.Shape();pts.forEach((p,i)=>i?s.lineTo(p[0],p[1]):s.moveTo(p[0],p[1]));return s};
+  const floor=new THREE.Mesh(new THREE.ShapeGeometry(shapeOf(outline)).rotateX(Math.PI/2),new THREE.MeshStandardMaterial({color:0x1a1a1a,roughness:.9,side:THREE.DoubleSide}));
+  floor.receiveShadow=true;scene.add(floor);
+  const grid=new THREE.GridHelper(Math.ceil(span)+10,Math.ceil(span)+10,0x3a3208,0x222222);grid.position.set(cx,0.005,cz);scene.add(grid);
+  const wallMat=new THREE.MeshStandardMaterial({color:0x4a90d9,transparent:true,opacity:.12,side:THREE.DoubleSide});
+  for(let i=0;i<outline.length;i++){const p=outline[i],q=outline[(i+1)%outline.length],len=Math.hypot(q[0]-p[0],q[1]-p[1]);if(len<.01)continue;
+    const w=new THREE.Mesh(new THREE.PlaneGeometry(len,3),wallMat);w.position.set((p[0]+q[0])/2,1.5,(p[1]+q[1])/2);w.rotation.y=-Math.atan2(q[1]-p[1],q[0]-p[0]);scene.add(w)}
+  const edge=new THREE.LineBasicMaterial({color:0xFFCD11});
+  scene.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(outline.map(p=>new THREE.Vector3(p[0],3,p[1]))),edge));
+  scene.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(outline.map(p=>new THREE.Vector3(p[0],.01,p[1]))),edge));
+  const KC={stage:0x4a90d9,display:0xe0a526,area:0x4a90d9,entrance:0x4aa564};
+  zones().forEach(z=>{
+    let pts;
+    if(z.shape==="poly")pts=z.pts.map(p=>[z.x+p[0],z.y+p[1]]);
+    else if(z.shape==="ellipse")pts=Array.from({length:40},(_,k)=>{const a=k/40*Math.PI*2;return[z.x+z.w/2+Math.cos(a)*z.w/2,z.y+z.h/2+Math.sin(a)*z.h/2]});
+    else pts=[[z.x,z.y],[z.x+z.w,z.y],[z.x+z.w,z.y+z.h],[z.x,z.y+z.h]];
+    if(z.shape!=="poly"&&z.rot){const ox=z.x+z.w/2,oy=z.y+z.h/2,a=z.rot*Math.PI/180;
+      pts=pts.map(([x,y])=>[ox+(x-ox)*Math.cos(a)-(y-oy)*Math.sin(a),oy+(x-ox)*Math.sin(a)+(y-oy)*Math.cos(a)])}
+    const h=z.kind==="stage"?0.8:z.kind==="display"?3:0.03;
+    const m=new THREE.Mesh(new THREE.ExtrudeGeometry(shapeOf(pts),{depth:h,bevelEnabled:false}).rotateX(Math.PI/2),
+      new THREE.MeshStandardMaterial({color:KC[z.kind]||KC.area,transparent:z.kind==="area",opacity:z.kind==="area"?.35:1,roughness:.6}));
+    m.position.y=h;m.castShadow=m.receiveShadow=true;scene.add(m);
+    const lx=pts.reduce((s,p)=>s+p[0],0)/pts.length,lz=pts.reduce((s,p)=>s+p[1],0)/pts.length;
+    const l=label3(z.label,0xffffff,.8);l.position.set(lx,h+.7,lz);scene.add(l)});
+  const clickables=[],COL={empty:0x555555,host:0x8f86e8,assigned:0xe0a526,arrived:0x4aa564};
+  const chairGeo=new THREE.BoxGeometry(.42,.45,.42),backGeo=new THREE.BoxGeometry(.42,.5,.06);
+  tables().forEach(t=>{
+    const d=dims(t),g=new THREE.Group();g.position.set(t.x,0,t.y);g.rotation.y=-(t.rot||0)*Math.PI/180;
+    const topMat=new THREE.MeshStandardMaterial({color:0xdddddd,roughness:.5});let top;
+    if(d.e){top=new THREE.Mesh(new THREE.CylinderGeometry(1,1,.05,40),topMat);top.scale.set(d.tx,1,d.ty)}
+    else top=new THREE.Mesh(new THREE.BoxGeometry(2*d.tx,.05,2*d.ty),topMat);
+    top.position.y=.75;top.castShadow=top.receiveShadow=true;g.add(top);
+    const leg=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,.72,10),new THREE.MeshStandardMaterial({color:0x333333}));leg.position.y=.36;g.add(leg);
+    t.seats.forEach((s,i)=>{
+      const[px,py]=chairPos(t,i);let st="empty",info={};
+      if(i===0){if(s){st="host";info={who:empName(s.u),sub:s.role||"Host"}}}
+      else if(s){const a=attById[s.a];if(a){st=a.arrived?"arrived":"assigned";info={who:a.name,sub:a.company}}}
+      const mat=new THREE.MeshStandardMaterial({color:COL[st],roughness:.6});
+      const c=new THREE.Mesh(chairGeo,mat);c.position.set(px,.225,py);c.castShadow=true;
+      const ang=Math.atan2(py,px),bk=new THREE.Mesh(backGeo,mat);
+      bk.position.set(px+Math.cos(ang)*.21,.7,py+Math.sin(ang)*.21);bk.rotation.y=Math.PI/2-ang;bk.castShadow=true;
+      c.userData=bk.userData=Object.assign({table:t.num,seat:i+1,st},info);
+      g.add(c,bk);clickables.push(c,bk)});
+    const l=label3(String(t.num),0xFFCD11,.9);l.position.set(0,1.45,0);g.add(l);
+    scene.add(g)});
+  const ctl=new THREE.OrbitControls(cam,renderer.domElement);ctl.target.set(cx,0,cz);ctl.enableDamping=true;
+  ctl.maxPolarAngle=Math.PI/2.05;ctl.minDistance=1.5;ctl.maxDistance=span*4;
+  const stage=zones().find(z=>z.kind==="stage"),ent=zones().find(z=>z.kind==="entrance");
+  const zc=z=>{const q=zbox(z);return[q.x+q.w/2,q.y+q.h/2]};
+  const presets={
+    top:[[cx,span*1.25,cz+.01],[cx,0,cz]],
+    iso:[[cx+span*.65,span*.55,cz+span*.65],[cx,0,cz]],
+    stage:stage?(()=>{const[sx,sz]=zc(stage);return[[sx,2.6,sz],[cx,.8,cz]]})():null,
+    entrance:ent?(()=>{const[ex,ez]=zc(ent),tg=stage?zc(stage):[cx,cz],dx=tg[0]-ex,dz=tg[1]-ez,l=Math.hypot(dx,dz)||1;
+      return[[ex+dx/l,1.7,ez+dz/l],[tg[0],1.2,tg[1]]]})():null};
+  let anim=null;
+  function go(k){const p=presets[k];if(!p){flash(k==="stage"?"Add a zone of type Stage first":"Add a zone of type Entrance first");return}
+    anim={t:0,fp:cam.position.clone(),ft:ctl.target.clone(),tp:new THREE.Vector3(...p[0]),tt:new THREE.Vector3(...p[1])}}
+  cam.position.set(...presets.iso[0]);ctl.update();
+  const ray=new THREE.Raycaster(),mouse=new THREE.Vector2(),tip=$("v3dtip");let downAt=null;
+  const onDown=e=>{downAt=[e.clientX,e.clientY]};
+  const onUp=e=>{if(!downAt||Math.hypot(e.clientX-downAt[0],e.clientY-downAt[1])>4)return;
+    const r=renderer.domElement.getBoundingClientRect();
+    mouse.set(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1);ray.setFromCamera(mouse,cam);
+    const hit=ray.intersectObjects(clickables)[0];
+    if(hit){const u=hit.object.userData;
+      tip.innerHTML=`<b>Table ${u.table} · Seat ${u.seat}</b><br>`+(u.who?`${esc(u.who)}<br><span style="color:#8aa0b8">${esc(u.sub||"")}</span>`:`<span style="color:#8aa0b8">Empty seat</span>`);
+      tip.style.left=(e.clientX-r.left+12)+"px";tip.style.top=(e.clientY-r.top+12)+"px";tip.style.display="block"}
+    else tip.style.display="none"};
+  renderer.domElement.addEventListener("pointerdown",onDown);renderer.domElement.addEventListener("pointerup",onUp);
+  const onResize=()=>{cam.aspect=box.clientWidth/box.clientHeight;cam.updateProjectionMatrix();renderer.setSize(box.clientWidth,box.clientHeight)};
+  window.addEventListener("resize",onResize);
+  const clock=new THREE.Clock();let raf;
+  (function loop(){raf=requestAnimationFrame(loop);const dt=clock.getDelta();
+    if(anim){anim.t=Math.min(1,anim.t+dt/.9);const k=anim.t<.5?2*anim.t*anim.t:1-Math.pow(-2*anim.t+2,2)/2;
+      cam.position.lerpVectors(anim.fp,anim.tp,k);ctl.target.lerpVectors(anim.ft,anim.tt,k);if(anim.t>=1)anim=null}
+    ctl.update();renderer.render(scene,cam)})();
+  R3={go,close(){cancelAnimationFrame(raf);window.removeEventListener("resize",onResize);ctl.dispose();renderer.dispose();
+    renderer.domElement.remove();tip.style.display="none";box.style.display="none";R3=null}};
+}
+$("b3d").onclick=()=>{if(!R3)open3D()};
+document.querySelectorAll("#v3dbar [data-cam]").forEach(b=>b.onclick=()=>{if(R3)R3.go(b.dataset.cam)});
+$("v3dclose").onclick=()=>{if(R3)R3.close()};
 setDirty();
 initAuth();
 </script>
