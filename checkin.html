@@ -42,6 +42,7 @@ button.ghost{width:100%;padding:12px;border-radius:10px;border:1px solid var(--l
 .person .sub{font-size:.8rem;color:var(--dim);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .person .act{padding:9px 14px;border-radius:8px;border:none;background:var(--y);color:#111;font-weight:700;font-size:.85rem;white-space:nowrap}
 .person.done{opacity:.6}.badge{font-size:.8rem;color:var(--go);font-weight:700;white-space:nowrap}
+.person .alt{padding:9px 12px;border-radius:8px;border:1px solid var(--line);background:none;color:var(--ink);font-weight:700;font-size:.85rem;white-space:nowrap;margin-right:6px}
 .close{font-size:.72rem;color:var(--warn)}
 .empty,.spin{text-align:center;color:var(--dim);font-size:.9rem;padding:28px 16px;line-height:1.5}
 .lead{color:var(--dim);font-size:.88rem;line-height:1.5;margin:0 0 16px}
@@ -199,8 +200,8 @@ function renderPeople(list){const box=$("searchResults");
   box.innerHTML=list.map(p=>`<div class="person ${p.checkedIn?"done":""}"><div class="info">
       <div class="nm">${esc(p.name||"(no name)")}${p.close?` <span class="close">close match</span>`:""}</div>
       <div class="sub">${esc([p.company,maskPhone(p.phone),p.desk?`Table ${p.desk} · Seat ${p.seat||"?"}`:""].filter(Boolean).join(" · "))}</div></div>
-      ${p.checkedIn?`<div class="badge">✓ ${p.time?fmt(p.time):"In"}</div>`:`<button class="act" data-token="${esc(p.token||"")}">Check in</button>`}</div>`).join("");
-  box.querySelectorAll(".act").forEach(b=>b.onclick=()=>manual(b))}
+      ${p.checkedIn?`<div class="badge">✓ ${p.time?fmt(p.time):"In"}</div>`:`<button class="alt" data-sub="${esc(p.token||"")}" data-name="${esc(p.name||"")}">On behalf</button><button class="act" data-token="${esc(p.token||"")}">Check in</button>`}</div>`).join("");
+  box.querySelectorAll(".act").forEach(b=>b.onclick=()=>manual(b));   box.querySelectorAll(".alt").forEach(b=>b.onclick=()=>openSubstitute(b.dataset.sub,b.dataset.name))}
 async function manual(btn){btn.disabled=true;btn.textContent="…";
   try{const d=await callFlow({action:"checkin",token:btn.dataset.token,deviceName:"Scanner-Manual"});
     if(d.status==="ok"||d.status==="already"){upsert(btn.dataset.token,{checkedIn:true,time:d.time});btn.closest(".person").classList.add("done");btn.outerHTML=`<div class="badge">✓ In${d.desk?" · T"+d.desk:""}</div>`}
@@ -232,7 +233,7 @@ function openSubstitute(token,origName){const S=$("sheetBox");$("sheet").hidden=
     $("sGo").disabled=true;$("sGo").textContent="…";
     try{const d=await callFlow({action:"substitute",token,name,phone:$("sPhone").value.trim(),company:$("sCompany").value.trim(),email:$("sEmail").value.trim()});
       if(d.status==="ok"){LIST=LIST.filter(a=>a.token!==token);LIST.push({name:d.name,company:d.company,phone:"",email:"",token:d.token,checkedIn:true,time:d.time,desk:d.desk,seat:d.seat});
-        closeSheet();show({kind:"go",mark:"✓",who:d.name,meta:`On behalf of ${d.replaced||"invited guest"}`,seat:seatLine(d),token:d.token,company:d.company,name:d.name})}
+        closeSheet();document.querySelector('nav button[data-tab="scan"]').click();busy=true;pause();show({kind:"go",mark:"✓",who:d.name,meta:`On behalf of ${d.replaced||"invited guest"}`,seat:seatLine(d),token:d.token,company:d.company,name:d.name})}
       else{$("sMsg").textContent=d.message||"Couldn't save.";$("sGo").disabled=false;$("sGo").textContent="Check in"}}
     catch(e){$("sMsg").textContent=connMsg(e);$("sGo").disabled=false;$("sGo").textContent="Check in"}}}
 
