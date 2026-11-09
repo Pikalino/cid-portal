@@ -10,7 +10,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{background:transparent;color:#fff;font-family:"Barlow","Segoe UI",system-ui,sans-serif}
 .wrap{padding:0 0 14px}
-.hero{position:relative;overflow:hidden;border-radius:16px;background:var(--k);display:grid;grid-template-columns:1.3fr .7fr;align-items:center;gap:16px;padding:26px 34px 34px;min-height:220px}
+.hero{position:relative;overflow:hidden;border-radius:16px;background:var(--k);display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:16px;padding:26px 34px 34px;min-height:220px}
 .hero::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:28px 28px;animation:pan 50s linear infinite}
 @keyframes pan{to{background-position:28px 28px}}
 .hero>*{position:relative}
@@ -19,7 +19,7 @@ html,body{background:transparent;color:#fff;font-family:"Barlow","Segoe UI",syst
 h1{font-size:clamp(30px,4vw,46px);line-height:1.05;font-weight:800;margin:10px 0 4px}
 h1 span{color:var(--y)}
 .sub{font-size:16px;color:var(--y);font-weight:700}
-.art{width:100%;max-height:200px}
+.art{width:100%;max-height:230px;overflow:visible}
 .stripe{position:absolute;left:0;right:0;bottom:0;height:8px;background:repeating-linear-gradient(-45deg,var(--y) 0 14px,var(--k) 14px 28px);background-size:40px 40px;animation:slide 1.2s linear infinite}
 @keyframes slide{to{background-position:40px 0}}
 .grid{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;margin-top:16px}
@@ -56,7 +56,7 @@ html,body{overflow-x:hidden} @media (max-width:760px){   .hero{grid-template-col
 <div class="wrap">
   <section class="hero">
     <div><div class="eyebrow"><i></i>Barloworld Mongolia</div><h1>CI <span>Department</span></h1><div class="sub">CI хэлтэс</div></div>
-    <svg class="art" viewBox="-12 -10 372 200" aria-hidden="true">
+    <svg class="art" viewBox="-30 -30 410 225" aria-hidden="true">
       <rect x="-12" y="170" width="372" height="1.5" fill="#FFCD11" fill-opacity="0.35"/>
       <ellipse cx="22" cy="172" rx="34" ry="6" fill="#4a3320"/>
       <ellipse cx="16" cy="169" rx="18" ry="5" fill="#5c4028"/>
