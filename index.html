@@ -3,153 +3,101 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CID Portal</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>CI Department</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--y:#FFCD11;--k:#111111;--k2:#1c1c1c;--g:#6b6b6b;--line:#e6e6e6;--soft:#f4f4f4}
+:root{--y:#FFCD11;--k:#111;--c:#1a1a1a;--line:#333;--dim:#9a9a9a}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{background:transparent;color:var(--k);font-family:"Barlow","Segoe UI",system-ui,sans-serif}
-.wrap{width:100%;padding:0 0 20px}
-.hero{position:relative;overflow:hidden;border-radius:18px;background:var(--k);color:#fff;display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:20px;
-  padding:44px 44px 58px;min-height:520px;animation:rise .7s ease both}
-.hero::before{content:"";position:absolute;inset:0;pointer-events:none;
-  background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);
-  background-size:32px 32px;animation:pan 50s linear infinite}
-@keyframes pan{to{background-position:32px 32px}}
+html,body{background:transparent;color:#fff;font-family:"Barlow","Segoe UI",system-ui,sans-serif}
+.wrap{padding:0 0 14px}
+.hero{position:relative;overflow:hidden;border-radius:16px;background:var(--k);display:grid;grid-template-columns:1.3fr .7fr;align-items:center;gap:16px;padding:26px 34px 34px;min-height:220px}
+.hero::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:28px 28px;animation:pan 50s linear infinite}
+@keyframes pan{to{background-position:28px 28px}}
 .hero>*{position:relative}
-.stripe{position:absolute;left:0;right:0;bottom:0;height:12px;
-  background:repeating-linear-gradient(-45deg,var(--y) 0 16px,var(--k) 16px 32px);background-size:45px 45px;animation:slide 1.2s linear infinite,grow .9s .2s ease both;transform-origin:left}
-@keyframes slide{to{background-position:45px 0}}
-@keyframes grow{from{transform:scaleX(0)}}
-.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.7)}
-.eyebrow i{width:26px;height:4px;background:var(--y);border-radius:2px}
-h1{font-size:clamp(40px,5vw,68px);line-height:1.02;font-weight:800;margin:16px 0 14px;letter-spacing:-.01em}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+.eyebrow i{width:24px;height:4px;background:var(--y);border-radius:2px}
+h1{font-size:clamp(30px,4vw,46px);line-height:1.05;font-weight:800;margin:10px 0 4px}
 h1 span{color:var(--y)}
-.lead{font-size:19px;line-height:1.55;color:rgba(255,255,255,.72);max-width:500px}
-.search{display:flex;align-items:center;gap:10px;margin-top:26px;max-width:480px;background:#fff;border-radius:12px;padding:6px 6px 6px 16px;
-  box-shadow:0 0 0 0 rgba(255,205,17,.0);transition:box-shadow .25s}
-.search:focus-within{box-shadow:0 0 0 4px rgba(255,205,17,.45)}
-.search svg{flex:none;color:var(--g)}
-.search input{flex:1;min-width:0;border:none;outline:none;font:inherit;font-size:15px;color:var(--k);background:transparent;padding:8px 0}
-.search button{border:none;background:var(--y);color:var(--k);font:inherit;font-weight:700;font-size:14px;padding:10px 18px;border-radius:9px;cursor:pointer;transition:transform .2s}
-.search button:hover{transform:translateY(-1px)}
-.art{width:100%;height:auto}
+.sub{font-size:16px;color:var(--y);font-weight:700}
+.art{width:100%;max-height:180px}
 .arm{transform-box:view-box;transform-origin:245px 150px;animation:dig 4.5s ease-in-out infinite alternate}
 @keyframes dig{from{transform:rotate(-7deg)}to{transform:rotate(5deg)}}
-.ground{stroke-dasharray:8 10;animation:roll 1.6s linear infinite}
-@keyframes roll{to{stroke-dashoffset:-36}}
-.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:16px}
-.card{position:relative;overflow:hidden;display:flex;flex-direction:column;padding:22px;border-radius:16px;border:1px solid #333;background:#1a1a1a;color:#fff;text-decoration:none;
-  transition:transform .25s,box-shadow .25s,border-color .25s;animation:rise .6s ease both;animation-delay:var(--d)}
-.card:hover{transform:translateY(-5px);box-shadow:0 16px 32px rgba(0,0,0,.10);border-color:var(--y)}
-.card::after{content:"";position:absolute;left:0;bottom:0;height:4px;width:0;background:var(--y);transition:width .35s}
-.card:hover::after{width:100%}
-.ico{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:var(--y);color:var(--k);transition:transform .3s}
-.card:hover .ico{transform:rotate(-6deg) scale(1.08)}
-.card h3{font-size:20px;font-weight:700;margin:16px 0 6px}
-.card p{font-size:14px;line-height:1.5;color:#a8a8a8;flex:1}
-.go{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-size:14px;font-weight:700;color:#fff}
-.go svg{transition:transform .25s}
-.card:hover .go svg{transform:translateX(4px)}
-.card.soon{cursor:default;opacity:.5}
-.card.soon:hover{transform:none;box-shadow:none;border-color:#333}
-.card.soon:hover::after{width:0}.card.soon:hover .ico{transform:none}
-.card.soon .ico{background:#2a2a2a;color:#777}
-.card.soon .go{color:var(--g)}
-.card.hub:hover{transform:none;box-shadow:none;border-color:#333}
-.card.hub:hover::after{width:0}.card.hub:hover .ico{transform:none}
-.depts{display:grid;gap:6px;margin-top:6px}
-.depts a{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:8px;background:#232323;border:1px solid #333;color:#fff;text-decoration:none;font-size:13px;font-weight:600;transition:border-color .2s,transform .2s}
-.depts a:hover{border-color:var(--y);transform:translateX(3px)}
-.depts a span{color:var(--y)}
-@keyframes rise{from{opacity:0;transform:translateY(14px)}}
-@media (max-width:640px){
-  .hero{grid-template-columns:1fr;padding:30px 26px 44px;min-height:0}
-  .art{display:none}
-  h1{font-size:34px}
-  .cards{grid-template-columns:1fr;gap:10px;margin-top:12px}
-  .card{flex-direction:row;align-items:center;gap:14px;padding:14px 16px}
-  .card h3{margin:0;font-size:17px}
-  .card p{display:none}
-  .card .go{margin:0 0 0 auto}
-  .card.hub{flex-direction:column;align-items:stretch}
-}
+.stripe{position:absolute;left:0;right:0;bottom:0;height:8px;background:repeating-linear-gradient(-45deg,var(--y) 0 14px,var(--k) 14px 28px);background-size:40px 40px;animation:slide 1.2s linear infinite}
+@keyframes slide{to{background-position:40px 0}}
+.grid{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;margin-top:16px}
+.box{background:var(--c);border:1px solid var(--line);border-radius:16px;padding:18px;animation:rise .6s ease both}
+.box h2{font-size:18px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.box h2 i{width:20px;height:4px;background:var(--y);border-radius:2px}
+.row{display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:8px;border:1px solid var(--line);border-left:4px solid var(--y);border-radius:10px;background:#141414;transition:border-color .2s,transform .2s,background .2s}
+.row:hover{border-color:var(--y);background:#1d1d1d;transform:translateX(3px)}
+.ic{width:32px;height:32px;min-width:32px;border-radius:8px;background:var(--y);color:var(--k);display:grid;place-items:center}
+.nm{flex:1;min-width:0;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{flex-shrink:0;white-space:nowrap;font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;text-decoration:none;transition:transform .2s}
+.pill:hover{transform:translateY(-1px)}
+.pill.f{background:var(--y);color:var(--k)}.pill.r{border:1px solid var(--y);color:var(--y)}
+.rep{position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;text-decoration:none;color:#fff;transition:border-color .25s,transform .25s,box-shadow .25s}
+.rep:hover{border-color:var(--y);transform:translateY(-4px);box-shadow:0 16px 32px rgba(0,0,0,.4)}
+.rep::after{content:"";position:absolute;left:0;bottom:0;height:4px;width:0;background:var(--y);transition:width .35s}
+.rep:hover::after{width:100%}
+.big{width:56px;height:56px;border-radius:14px;background:var(--y);color:var(--k);display:grid;place-items:center;transition:transform .3s}
+.rep:hover .big{transform:rotate(-6deg) scale(1.08)}
+.rep h3{font-size:24px;font-weight:800;margin:16px 0 6px}
+.rep p{color:var(--dim);font-size:14px;line-height:1.5}
+.rep p b{color:#fff;font-weight:600}
+.steps{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.steps span{font-size:12px;font-weight:600;color:#ddd;background:#232323;border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+.cta{display:inline-flex;align-items:center;gap:8px;margin-top:16px;align-self:flex-start;background:var(--y);color:var(--k);font-weight:800;font-size:15px;padding:12px 18px;border-radius:10px}
+.cta svg{transition:transform .25s}
+.rep:hover .cta svg{transform:translateX(4px)}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}}
+@media (max-width:760px){.grid{grid-template-columns:1fr}.hero{grid-template-columns:1fr}.art{display:none}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <section class="hero">
-    <div>
-      <div class="eyebrow"><i></i>CID · Barloworld Mongolia</div>
-      <h1>Everything CID,<br><span>in one place.</span></h1>
-      <p class="lead">Dashboards, CRM help, event tools and department resources for the whole team.</p>
-      <form class="search" id="sform" target="_top" method="get">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input name="q" placeholder="Хайх · Search CID" autocomplete="off" aria-label="Search CID">
-        <button type="submit">Search</button>
-      </form>
-    </div>
-    <svg class="art" viewBox="0 0 420 290" fill="none" aria-hidden="true">
-      <path class="ground" d="M10 262H410" stroke="rgba(255,255,255,.35)" stroke-width="2"/>
+    <div><div class="eyebrow"><i></i>Barloworld Mongolia</div><h1>CI <span>Department</span></h1><div class="sub">CI хэлтэс</div></div>
+    <svg class="art" viewBox="40 80 370 190" fill="none" aria-hidden="true">
       <g stroke="#FFCD11" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
         <rect x="58" y="212" width="204" height="42" rx="21"/>
         <circle cx="84" cy="233" r="11"/><circle cx="124" cy="233" r="9"/><circle cx="160" cy="233" r="9"/><circle cx="196" cy="233" r="9"/><circle cx="236" cy="233" r="11"/>
-        <rect x="76" y="165" width="176" height="47" rx="6"/>
-        <rect x="56" y="170" width="24" height="36" rx="4"/>
-        <path d="M168 165V98h56l22 32v35"/>
-        <path d="M178 108v28h54l-12-28z" stroke-width="2"/>
-        <g class="arm">
-          <path d="M245 152 322 84" stroke-width="6"/>
-          <path d="M322 84 372 170" stroke-width="5"/>
-          <path d="M232 168 296 108" stroke-width="2" stroke-dasharray="4 4"/>
-          <path d="M364 166 392 176 386 208 356 202z" fill="rgba(255,205,17,.15)"/>
-        </g>
+        <rect x="76" y="165" width="176" height="47" rx="6"/><rect x="56" y="170" width="24" height="36" rx="4"/>
+        <path d="M168 165V98h56l22 32v35"/><path d="M178 108v28h54l-12-28z" stroke-width="2"/>
+        <g class="arm"><path d="M245 152 322 84" stroke-width="6"/><path d="M322 84 372 170" stroke-width="5"/><path d="M364 166 392 176 386 208 356 202z" fill="rgba(255,205,17,.15)"/></g>
       </g>
-      <text x="210" y="284" text-anchor="middle" fill="rgba(255,255,255,.45)" font-size="11" font-family="Barlow,sans-serif" letter-spacing="2">CID · 2027</text>
     </svg>
     <div class="stripe"></div>
   </section>
 
-  <section class="cards">
-    <a class="card" data-link="crm" style="--d:.15s">
-      <div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.8c1.7.8 2.8 2.6 3 5.2"/></svg></div>
-      <h3>CRM</h3><p>How-to guides, and report an issue or share an idea.</p>
-      <span class="go">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-    </a>
-    <a class="card" data-link="events" style="--d:.25s">
-      <div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v.01M14 21h7v-4"/></svg></div>
-      <h3>Events</h3><p>QR check-in, seat planner and event-day tools.</p>
-      <span class="go">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-    </a>
-        <div class="card hub" style="--d:.35s">
-      <div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h5v18H6a2 2 0 0 1-2-2zM13 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5z"/></svg></div>
-      <h3>Resources</h3>
-      <div class="depts">
-        <a data-link="r1">CI Prime CAT Sales <span>→</span></a>
-        <a data-link="r2">Energy &amp; Transportation <span>→</span></a>
-        <a data-link="r3">Analytics &amp; Support <span>→</span></a>
-        <a data-link="r4">Marketing <span>→</span></a>
+  <div class="grid">
+    <section class="box" style="animation-delay:.1s"><h2><i></i>Resources · Нөөц</h2><div id="res"></div></section>
+    <a class="box rep" id="repCard" target="_blank" rel="noopener" style="animation-delay:.2s">
+      <div>
+        <div class="big"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></div>
+        <h3>Reports · Тайлан</h3>
+        <p><b>Upload and view</b> department reports in one place. Тайлангаа оруулж, бусад хэлтсийн тайланг үзнэ.</p>
+        <div class="steps"><span>1 · Open your department folder</span><span>2 · Drag your file in</span><span>3 · Done</span></div>
       </div>
-    </div>
-  </section>
+      <span class="cta">Open reports <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </a>
+  </div>
 </div>
 <script>
-/* ===== Your links ===== */
-const SITE = "https://barloworldmn.sharepoint.com/teams/CISharepoint";
-const LINKS = {
-  crm: "https://barloworldmn.sharepoint.com/teams/CISharepoint/SitePages/CRM.aspx",
-  events: "https://barloworldmn.sharepoint.com/teams/CISharepoint/SitePages/Events.aspx",
-  r1: "https://barloworldmn.sharepoint.com/teams/CISharepoint/CI%20Prime%20CAT%20Sales/Forms/Files.aspx",
-  r2: "https://barloworldmn.sharepoint.com/teams/CISharepoint/Energy%20%20Transportation/Forms/Files.aspx",
-  r3: "https://barloworldmn.sharepoint.com/teams/CISharepoint/Analytics%20%20Support/Forms/Files.aspx",
-  r4: "https://barloworldmn.sharepoint.com/teams/CISharepoint/Marketing/Forms/Files.aspx"
-};
-/* ====================== */
-document.querySelectorAll("[data-link]").forEach(a=>{   a.href=LINKS[a.dataset.link]||"#";   if(a.dataset.link.startsWith("r")){a.target="_blank";a.rel="noopener"}else{a.target="_top"} });
-document.getElementById("sform").action = SITE + "/_layouts/15/search.aspx/siteall";
+/* ===================== YOUR LINKS ===================== */
+const REPORTS_URL = "https://barloworldmn.sharepoint.com/teams/CISharepoint/Shared%20Documents/Forms/AllItems.aspx";
+const DEPARTMENTS = [
+  { name:"CI Prime CAT Sales",      files:"https://barloworldmn.sharepoint.com/teams/CISharepoint/CI%20Prime%20CAT%20Sales/Forms/Files.aspx?viewid=33c59b11%2D84d1%2D46a7%2D99f6%2D77b3b872fc96", reports:"https://barloworldmn.sharepoint.com/teams/CISharepoint/CI%20Prime%20CAT%20Sales/Forms/Files.aspx?viewid=d9f3bdd6%2D00f3%2D4190%2D8b93%2De89c3cb9c82d" },
+  { name:"Energy & Transportation", files:"https://barloworldmn.sharepoint.com/teams/CISharepoint/Energy%20%20Transportation/Forms/Files.aspx", reports:"https://barloworldmn.sharepoint.com/teams/CISharepoint/Energy%20%20Transportation/Forms/Files.aspx?viewid=765cce3e%2D17d6%2D4304%2Db767%2Dea220877accb" },
+  { name:"Analytics & Support",     files:"https://barloworldmn.sharepoint.com/teams/CISharepoint/Analytics%20%20Support/Forms/Files.aspx", reports:"https://barloworldmn.sharepoint.com/teams/CISharepoint/Analytics%20%20Support/Forms/Files.aspx?viewid=881f3d61%2D5a3f%2D4c31%2D9411%2Da28ec9f0fb20" },
+  { name:"Marketing",               files:"https://barloworldmn.sharepoint.com/teams/CISharepoint/Marketing/Forms/Files.aspx", reports:"https://barloworldmn.sharepoint.com/teams/CISharepoint/Marketing/Forms/Files.aspx?viewid=d6a25b7a%2D9a0a%2D4306%2Da1ff%2Db03ab05ec8f3" }
+];
+/* ====================================================== */
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const FOLDER='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
+document.getElementById("res").innerHTML=DEPARTMENTS.map(d=>`<div class="row"><div class="ic">${FOLDER}</div><div class="nm" title="${esc(d.name)}">${esc(d.name)}</div>
+  <a class="pill f" href="${esc(d.files)}" target="_blank" rel="noopener">Files ↗</a><a class="pill r" href="${esc(d.reports)}" target="_blank" rel="noopener">Reports ↗</a></div>`).join("");
+document.getElementById("repCard").href=REPORTS_URL;
 </script>
 </body>
 </html>
