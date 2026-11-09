@@ -19,9 +19,7 @@ html,body{background:transparent;color:#fff;font-family:"Barlow","Segoe UI",syst
 h1{font-size:clamp(30px,4vw,46px);line-height:1.05;font-weight:800;margin:10px 0 4px}
 h1 span{color:var(--y)}
 .sub{font-size:16px;color:var(--y);font-weight:700}
-.art{width:100%;max-height:180px}
-.arm{transform-box:view-box;transform-origin:245px 150px;animation:dig 4.5s ease-in-out infinite alternate}
-@keyframes dig{from{transform:rotate(-7deg)}to{transform:rotate(5deg)}}
+.art{width:100%;max-height:200px}
 .stripe{position:absolute;left:0;right:0;bottom:0;height:8px;background:repeating-linear-gradient(-45deg,var(--y) 0 14px,var(--k) 14px 28px);background-size:40px 40px;animation:slide 1.2s linear infinite}
 @keyframes slide{to{background-position:40px 0}}
 .grid{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;margin-top:16px}
@@ -58,13 +56,51 @@ html,body{overflow-x:hidden} @media (max-width:760px){   .hero{grid-template-col
 <div class="wrap">
   <section class="hero">
     <div><div class="eyebrow"><i></i>Barloworld Mongolia</div><h1>CI <span>Department</span></h1><div class="sub">CI хэлтэс</div></div>
-    <svg class="art" viewBox="40 80 370 190" fill="none" aria-hidden="true">
-      <g stroke="#FFCD11" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-        <rect x="58" y="212" width="204" height="42" rx="21"/>
-        <circle cx="84" cy="233" r="11"/><circle cx="124" cy="233" r="9"/><circle cx="160" cy="233" r="9"/><circle cx="196" cy="233" r="9"/><circle cx="236" cy="233" r="11"/>
-        <rect x="76" y="165" width="176" height="47" rx="6"/><rect x="56" y="170" width="24" height="36" rx="4"/>
-        <path d="M168 165V98h56l22 32v35"/><path d="M178 108v28h54l-12-28z" stroke-width="2"/>
-        <g class="arm"><path d="M245 152 322 84" stroke-width="6"/><path d="M322 84 372 170" stroke-width="5"/><path d="M364 166 392 176 386 208 356 202z" fill="rgba(255,205,17,.15)"/></g>
+    <svg class="art" viewBox="-12 -10 372 200" aria-hidden="true">
+      <rect x="-12" y="170" width="372" height="1.5" fill="#FFCD11" fill-opacity="0.35"/>
+      <ellipse cx="22" cy="172" rx="34" ry="6" fill="#4a3320"/>
+      <ellipse cx="16" cy="169" rx="18" ry="5" fill="#5c4028"/>
+      <g><animateTransform attributeName="transform" type="translate" values="45 0;0 0;0 0;45 0" keyTimes="0;0.2;0.8;1" dur="16s" repeatCount="indefinite"/>
+        <rect x="100" y="140" width="190" height="30" rx="15" fill="#1c1c1c"/>
+        <rect x="102" y="142" width="186" height="26" rx="13" fill="none" stroke="#3b3b3b" stroke-width="5" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" values="0;50;50;0" keyTimes="0;0.2;0.8;1" dur="16s" repeatCount="indefinite"/></rect>
+        <rect x="114" y="149" width="162" height="12" rx="6" fill="#262626"/>
+        <g fill="#444"><circle cx="150" cy="155" r="4"/><circle cx="180" cy="155" r="4"/><circle cx="210" cy="155" r="4"/><circle cx="240" cy="155" r="4"/></g>
+        <g><circle cx="116" cy="155" r="10" fill="#333"/><path d="M106 155H126M116 145V165" stroke="#1c1c1c" stroke-width="2"/><animateTransform attributeName="transform" type="rotate" values="0 116 155;-120 116 155;-120 116 155;0 116 155" keyTimes="0;0.2;0.8;1" dur="16s" repeatCount="indefinite"/></g>
+        <g><circle cx="274" cy="155" r="10" fill="#333"/><path d="M264 155H284M274 145V165" stroke="#1c1c1c" stroke-width="2"/><animateTransform attributeName="transform" type="rotate" values="0 274 155;-120 274 155;-120 274 155;0 274 155" keyTimes="0;0.2;0.8;1" dur="16s" repeatCount="indefinite"/></g>
+        <rect x="150" y="132" width="100" height="8" fill="#232323"/>
+        <path d="M112 132V102H300V132Z" fill="#FFCD11"/>
+        <path d="M112 124H300V132H112Z" fill="#D9A900"/>
+        <path d="M195 102V88H292Q302 88 302 98V102Z" fill="#FFCD11"/>
+        <path d="M232 92V99M240 92V99M248 92V99M256 92V99M264 92V99" stroke="#D9A900" stroke-width="2"/>
+        <path d="M285 100H306Q312 100 312 108V128Q312 134 304 134H285Z" fill="#D9A900"/>
+        <path d="M200 88V79H288V88M222 79V88M255 79V88" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
+        <rect x="270" y="74" width="5" height="14" fill="#2a2a2a"/>
+        <path d="M140 102V58H184L192 102Z" fill="#232323"/>
+        <path d="M145 98V63H180L186 98Z" fill="#2e3a40"/>
+        <path d="M148 66H165L152 95H148Z" fill="#3e4c55"/>
+        <rect x="176" y="52" width="6" height="6" rx="1" fill="#FFB000"><animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/></rect>
+        <g><animateTransform attributeName="transform" type="rotate" values="6 112 112;6 112 112;-7 112 112;-7 112 112;9 112 112;9 112 112;6 112 112;6 112 112" keyTimes="0;0.2;0.3;0.45;0.55;0.7;0.8;1" dur="16s" repeatCount="indefinite"/>
+          <path d="M128 124L92 62" stroke="#222" stroke-width="8" stroke-linecap="round"/>
+          <path d="M110 93L92 62" stroke="#c9c9c9" stroke-width="4" stroke-linecap="round"/>
+          <path d="M104 120Q92 60 50 30L58 12Q108 40 124 108Z" fill="#FFCD11"/>
+          <path d="M58 12Q108 40 124 108L119 109Q103 44 55 18Z" fill="#FFE27A"/>
+          <path d="M104 120Q92 60 50 30L53 36Q86 64 98 120Z" fill="#D9A900"/>
+          <circle cx="112" cy="112" r="5" fill="#222"/>
+          <g><animateTransform attributeName="transform" type="rotate" values="12 55 20;12 55 20;12 55 20;-14 55 20;-14 55 20;18 55 20;12 55 20;12 55 20" keyTimes="0;0.2;0.3;0.45;0.55;0.7;0.8;1" dur="16s" repeatCount="indefinite"/>
+            <path d="M44 4L58 6L66 18L44 120L30 118L40 14Z" fill="#D9A900"/>
+            <path d="M44 4L50 5L36 119L30 118L40 14Z" fill="#FFCD11"/>
+            <path d="M34 28L26 96" stroke="#222" stroke-width="6" stroke-linecap="round"/>
+            <path d="M28 80L26 96" stroke="#c9c9c9" stroke-width="3.5" stroke-linecap="round"/>
+            <circle cx="55" cy="20" r="4.5" fill="#222"/>
+            <g><animateTransform attributeName="transform" type="rotate" values="20 37 118;20 37 118;20 37 118;-15 37 118;-40 37 118;35 37 118;20 37 118;20 37 118" keyTimes="0;0.2;0.3;0.45;0.55;0.7;0.8;1" dur="16s" repeatCount="indefinite"/>
+              <path d="M40 112L20 114Q2 120 0 140L6 158L30 150Q46 136 44 116Z" fill="#FFCD11"/>
+              <path d="M6 158L30 150Q38 144 40 134L36 134Q30 146 6 152Z" fill="#D9A900"/>
+              <path d="M8 140Q16 126 30 130Q38 140 28 148L10 152Z" fill="#5c4028" opacity="0"><animate attributeName="opacity" values="0;0;0;1;1;0;0;0" keyTimes="0;0.2;0.3;0.45;0.55;0.7;0.8;1" dur="16s" repeatCount="indefinite"/></path>
+              <path d="M1 142L-5 146L3 148ZM2 150L-4 154L4 156Z" fill="#bfbfbf"/>
+              <circle cx="37" cy="118" r="4" fill="#222"/>
+            </g>
+          </g>
+        </g>
       </g>
     </svg>
     <div class="stripe"></div>
