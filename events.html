@@ -17,7 +17,7 @@ html,body{background:transparent;color:#fff;font-family:"Barlow","Segoe UI",syst
 .eyebrow i{width:26px;height:4px;background:var(--y);border-radius:2px}
 h1{font-size:34px;font-weight:800;margin:10px 0 4px}
 .sub{color:#a8a8a8;font-size:15px}
-.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 .card{position:relative;overflow:hidden;display:flex;flex-direction:column;min-height:210px;padding:22px;border-radius:16px;border:1px solid #333;background:#1a1a1a;color:#fff;text-decoration:none;
   transition:transform .25s,box-shadow .25s,border-color .25s;animation:rise .6s ease both;animation-delay:var(--d)}
 .card:hover{transform:translateY(-5px);box-shadow:0 16px 32px rgba(0,0,0,.4);border-color:var(--y)}
@@ -54,8 +54,7 @@ h1{font-size:34px;font-weight:800;margin:10px 0 4px}
 const TOOLS = [
   { title:"QR check-in", desc:"Scan guest QR codes, search guests and add walk-ins.", link:"https://pikalino.github.io/cid-portal/checkin.html", icon:"qr" },
   { title:"Seat planner", desc:"Blueprint hall map with tables, hosts, zones and seats.", link:"https://pikalino.github.io/cid-portal/desks.html", icon:"seat" },
-  { title:"Live view", desc:"Live arrivals and seat map for the venue screen.", link:"", icon:"screen" },
-  { title:"Past events", desc:"Photos, reports and results from previous events.", link:"", icon:"camera" }
+  { title:"Live view", desc:"Live arrivals and seat map for the venue screen.", link:"https://pikalino.github.io/cid-portal/live.html", icon:"screen" }
 ];
 /* ========================================================== */
 const ICONS={
